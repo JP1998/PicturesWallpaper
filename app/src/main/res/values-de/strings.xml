@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~      Copyright 2016 Jean-Pierre Hotz
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="app_name">SeveralPicturesWallpaper</string>
+    <string name="actionstring_delete">Wallpaper löschen</string>
+    <string name="actionstring_edit">Wallpaper verändern</string>
+    <string name="actionstring_fucku">Fick dich du Arsch!!</string>
+    <string name="actionstring_rename">Wallpaper umbenennen</string>
+    <string name="actionstring_select">Wallpaper auswählen</string>
+    <string name="appIntro_addSettings_caption">Wallpaper hinzufügen</string>
+    <string name="appIntro_addSettings_description">Sie können ein Wallpaper hinzufügen, indem Sie auf den Hinzufügen-Knopf klicken, und einen Namen für das Wallpaper eingeben.</string>
+    <string name="appIntro_backgroundImage_caption">Hintergrundbild</string>
+    <string name="appIntro_backgroundImage_description">Um Ihnen all diese Hintergrundbilder zur Verfügung stellen zu können benötigen wir Ihre Erlaubnis die von Ihnen ausgewählten Bilder zu speichern.</string>
+    <string name="appIntro_changeSettings_caption">Wallpaper ändern</string>
+    <string name="selected_text">Ausgewählt</string>
+    <string name="wallpaperLabel">SeveralPictureWallpaper</string>
+    <string name="selectTitle_caption">Titel auswählen</string>
+    <string name="menuitem_reviewIntro">Intro wiederholen</string>
+    <string name="menuitem_about">Über</string>
+    <string name="dialog_abort">Abbrechen</string>
+    <string name="dialog_fuckyou">Fick dich!</string>
+    <string name="dialog_fuckyou_answer">Ich liebe dich auch :*</string>
+    <string name="dialog_ok">Ok</string>
+    <string name="firstSettingName">Hallo Welt :)</string>
+    <string name="furthersettings_caption">Weitere Einstellungen</string>
+    <string name="furthersettings_detectgestures_hint">Gesten ermitteln, um zwischen den Bildern umzuschalten?</string>
+    <string name="furthersettings_time_hint">Zeit zwischen den Hintergrundbildern</string>
+    <string name="menuitem_selectwallpaper">Wallpaper auswählen</string>
+    <string name="appIntro_changeSettings_description">Sie können ein Wallpaper verändern, indem Sie die Verändern-Aktion auswählen, auf das gewünschte Wallpaper drücken, und anschließend die Bilder und Werte in dem auftauchenden Screen verändern.</string>
+    <string name="appIntro_contextMenu_caption">Aktionen</string>
+    <string name="appIntro_doneWithIntro_caption">Fertig</string>
+    <string name="deleteWallpaper_caption">Wallpaper löschen</string>
+    <string name="changesettingtitle_dialog_textfieldhint">Name des Wallpapers</string>
+    <string name="deleteChosenSetting_caption">Löschen des ausgewählten Wallpapers</string>
+    <string name="deleteWallpaper_description">Wollen Sie dieses Wallpaper wirklich löschen? Dies kann nicht rückgängig gemacht werden!</string>
+    <string name="deleteChosenSetting_message">Sie können das ausgewählte Wallpaper nicht löschen. Sorry!</string>
+    <string name="appIntro_contextMenu_description">Sie können eine Aktion ausführen, indem Sie in der Wallpaper-Liste nach unten wischen, und danach auf das Wallpaper klicken.\n\nAber bitte versuchen Sie nicht Ihr ausgewähltes Wallpaper zu löschen. :)</string>
+    <string name="appIntro_doneWithIntro_description">Sie können nun Ihr eigenes Wallpaper erstellen!\nSie müssen nur noch das SeveralPictureWallpaper-Livewallpaper als Ihren Hintergrund auswählen.\nWir werden Sie nun zu einem Wallpaper namens "Hallo Welt :)", das wir für Sie erstellt haben, weiterleiten.\nHaben Sie Spaß mit unserer App :)</string>
+    <string name="appIntro_review_doneWithIntro_description">Sie können nun Ihr eigenes Wallpaper erstellen!\nSie müssen nur noch das SeveralPictureWallpaper-Livewallpaper als Ihren Hintergrund auswählen.\nHaben Sie Spaß mit unserer App :)</string>
+</resources>
