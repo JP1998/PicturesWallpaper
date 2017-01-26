@@ -48,9 +48,6 @@ import de.jeanpierrehotz.severalpictureswallpaper.views.WallpaperNameViewHolder;
 import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImage;
 import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImageManager;
 
-//import com.prolificinteractive.chandelier.widget.ActionItem;
-//import com.prolificinteractive.chandelier.widget.SwipeActionLayout;
-
 public class MainActivity extends AppCompatActivity{
 
     private ArrayList<String> settings_caption;

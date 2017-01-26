@@ -1,10 +1,11 @@
 /*
- *      Copyright 2016 Jean-Pierre Hotz
+ *     Copyright 2017 Jean-Pierre Hotz
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -28,6 +29,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +39,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 import de.jeanpierrehotz.severalpictureswallpaper.utils.WallpaperPictureSelector;
@@ -87,12 +90,44 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
     private WallpaperImageAdapter.OnItemNormalButtonClickListener recyclerNormalButtonClickListener = new WallpaperImageAdapter.OnItemNormalButtonClickListener(){
         @Override
         public void onClick(RecyclerView.ViewHolder vh, int pos){
-            images.get(pos).releaseImage();
-            images.remove(pos);
-            recyclerAdapter.notifyDataSetChanged();
+//            images.get(pos).releaseImage();
+//            images.remove(pos);
+//            recyclerAdapter.notifyItemRemoved(pos);
+
+            getSharedPreferences(getString(R.string.preferencecode_miscellanous) + wallpaperindex, MODE_PRIVATE)
+                    .edit()
+                    .putInt(getString(R.string.prefs_currentIndex), pos)
+                    .apply();
+
         }
     };
 
+    private ItemTouchHelper wallpaperImageHelper;
+    private ItemTouchHelper.Callback wallpaperImageHelperCallback = new ItemTouchHelper.Callback() {
+        @Override
+        public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+            return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN,  ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+        }
+
+        @Override
+        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
+            int from = source.getAdapterPosition();
+            int to = target.getAdapterPosition();
+
+            Collections.swap(images, from, to);
+            recyclerAdapter.notifyItemMoved(from, to);
+
+            return true;
+        }
+
+        @Override
+        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+            int pos = viewHolder.getAdapterPosition();
+
+            images.remove(pos);
+            recyclerAdapter.notifyItemRemoved(pos);
+        }
+    };
 
     ///
     /// Data
@@ -109,7 +144,7 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
         public void onCropperResult(WallpaperPictureSelector.CropResult result, File srcFile, File outFile){
             if(result == WallpaperPictureSelector.CropResult.success){
                 images.add(new WallpaperImage(outFile.getAbsolutePath()));
-                recyclerAdapter.notifyDataSetChanged();
+                recyclerAdapter.notifyItemInserted(images.size() - 1);
             }
         }
     };
@@ -148,6 +183,8 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
         recyclerView.setLayoutManager(recyclerManager);
         recyclerView.setAdapter(recyclerAdapter);
 
+        wallpaperImageHelper = new ItemTouchHelper(wallpaperImageHelperCallback);
+        wallpaperImageHelper.attachToRecyclerView(recyclerView);
 
         SharedPreferences miscprefs = getSharedPreferences(getString(R.string.preferencecode_miscellanous) + wallpaperindex, MODE_PRIVATE);
 
@@ -174,7 +211,7 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
             requestPermissions(new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE }, CODE_TRIED_SELECTING_IMAGE);
             return;
         }
-        mWallpaperSelector.selectImage(ChangeWallpaperActivity.this);
+        mWallpaperSelector.selectImage(this);
     }
 
     @Override
