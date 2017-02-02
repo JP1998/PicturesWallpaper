@@ -41,6 +41,7 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import de.jeanpierrehotz.severalpictureswallpaper.utils.WallpaperPictureSelector;
 import de.jeanpierrehotz.severalpictureswallpaper.views.WallpaperImageAdapter;
@@ -63,13 +64,14 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
     private TextView furtherSettings_Value_TextView;
     private SeekBar furtherSettings_Value_SeekBar;
 
-    private Switch furtherSettings_Swipe_Switch;
+    private Switch furtherSettings_SwipeToSwitch_Switch;
+    private Switch furtherSettings_SwipeToSwitchWallpaper_Switch;
 
     // Listener
     private SeekBar.OnSeekBarChangeListener furtherSettings_Value_SeekBar_OnChangeListener = new SeekBar.OnSeekBarChangeListener(){
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean b){
-            furtherSettings_Value_TextView.setText(String.format("%1$.1fs", ((double) furtherSettings_Value_SeekBar.getProgress())));
+            furtherSettings_Value_TextView.setText(String.format(Locale.getDefault(), "%1$.1fs", ((double) furtherSettings_Value_SeekBar.getProgress())));
         }
         @Override
         public void onStartTrackingTouch(SeekBar seekBar){}
@@ -168,7 +170,9 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
         furtherSettings_Value_SeekBar = (SeekBar) findViewById(R.id.furthersettings_time_seekbar);
         furtherSettings_Value_SeekBar.setOnSeekBarChangeListener(furtherSettings_Value_SeekBar_OnChangeListener);
 
-        furtherSettings_Swipe_Switch = (Switch) findViewById(R.id.furthersettings_swipetoswitch_switch);
+        furtherSettings_SwipeToSwitch_Switch = (Switch) findViewById(R.id.furthersettings_swipetoswitch_switch);
+
+        furtherSettings_SwipeToSwitchWallpaper_Switch = (Switch) findViewById(R.id.furthersettings_swipetoswitchwallpaper_switch);
 
         mWallpaperSelector = new WallpaperPictureSelector(this);
         mWallpaperSelector.setCallback(mWallpaperSelectorCallback);
@@ -192,8 +196,9 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
         furtherSettings_Value_SeekBar.setProgress(1);
         furtherSettings_Value_SeekBar.setProgress(miscprefs.getInt(getString(R.string.prefs_showPictureTime), 60));
 
-        furtherSettings_Swipe_Switch.setChecked(miscprefs.getBoolean(getString(R.string.prefs_detectGestures), true));
+        furtherSettings_SwipeToSwitch_Switch.setChecked(miscprefs.getBoolean(getString(R.string.prefs_detectGestures), true));
 
+        furtherSettings_SwipeToSwitchWallpaper_Switch.setChecked(miscprefs.getBoolean(getString(R.string.prefs_lockwallpaper), true));
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener(){
@@ -239,7 +244,10 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
 
         //noinspection SimplifiableIfStatement
         if(id == R.id.menu_changewallpaper_selectwallpaper){
-            getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE).edit().putInt(getString(R.string.prefs_wallpaperindex), wallpaperindex).apply();
+            getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE)
+                    .edit()
+                    .putInt(getString(R.string.prefs_wallpaperindex), wallpaperindex)
+                    .apply();
             return true;
         }
 
@@ -273,7 +281,8 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
         getSharedPreferences(getString(R.string.preferencecode_miscellanous) + wallpaperindex, MODE_PRIVATE)
                 .edit()
                 .putInt(getString(R.string.prefs_showPictureTime), furtherSettings_Value_SeekBar.getProgress())
-                .putBoolean(getString(R.string.prefs_detectGestures), furtherSettings_Swipe_Switch.isChecked())
+                .putBoolean(getString(R.string.prefs_detectGestures), furtherSettings_SwipeToSwitch_Switch.isChecked())
+                .putBoolean(getString(R.string.prefs_lockwallpaper), furtherSettings_SwipeToSwitchWallpaper_Switch.isChecked())
                 .apply();
     }
 

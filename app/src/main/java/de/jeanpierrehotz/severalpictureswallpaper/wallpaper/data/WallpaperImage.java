@@ -1,10 +1,11 @@
 /*
- *      Copyright 2016 Jean-Pierre Hotz
+ *     Copyright 2017 Jean-Pierre Hotz
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +16,7 @@
 
 package de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,8 +26,12 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import com.blunderer.materialdesignlibrary.views.CardView;
+
+import java.util.Locale;
 
 /**
  *
@@ -48,11 +54,27 @@ public class WallpaperImage{
         mPath = path;
     }
 
-    public void loadImage(){
+    public void loadImage(Context ctx){
         if(mImage == null){
-            Bitmap immutableBitMap = BitmapFactory.decodeFile(mPath);
-            // make the loaded Bitmap to be mutable :)
-            mImage = immutableBitMap.copy(Bitmap.Config.ARGB_8888, true);
+            /*
+            BitmapFactory.Options opt = new BitmapFactory.Options();
+            opt.inSampleSize = calculateInSampleSize(x, y, SAMPLE_WIDTH, SAMPLE_HEIGHT);
+            opt.inJustDecodeBounds = false;
+            return BitmapFactory.decodeFile(mPath, opt);
+             */
+
+//            Bitmap immutableBitMap = BitmapFactory.decodeFile(mPath);
+//            // make the loaded Bitmap to be mutable :)
+//            Bitmap mImage = immutableBitMap.copy(Bitmap.Config.ARGB_8888, true);
+
+            DisplayMetrics display = new DisplayMetrics();
+            ((WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(display);
+
+            BitmapFactory.Options opt = new BitmapFactory.Options();
+            opt.inSampleSize = calculateInSampleSize(x, y, display.widthPixels, display.heightPixels);
+            opt.inJustDecodeBounds = false;
+
+            mImage = BitmapFactory.decodeFile(mPath, opt);
 
             x = mImage.getWidth();
             y = mImage.getHeight();
@@ -82,7 +104,7 @@ public class WallpaperImage{
 
     public String getResolution(){
         if(mImage != null || (x != 0 && y != 0)){
-            return String.format("%1$d x %2$dpx", x, y);
+            return String.format(Locale.getDefault(), "%1$d x %2$dpx", x, y);
         }else{
             return "0 x 0px";
         }
@@ -100,7 +122,7 @@ public class WallpaperImage{
         c.drawBitmap(mImage, new Rect(0, 0, mImage.getWidth(), mImage.getHeight()), new RectF(0, 0, x, y), p);
     }
 
-    class PreviewLoaderTask extends AsyncTask<Integer, Void, Bitmap>{
+    private class PreviewLoaderTask extends AsyncTask<Integer, Void, Bitmap>{
 
         private CardView cardViewReference;
 
@@ -124,25 +146,6 @@ public class WallpaperImage{
             return BitmapFactory.decodeFile(mPath, opt);
         }
 
-        private int calculateInSampleSize(int currWidth, int currHeight, int reqWidth, int reqHeight) {
-            int inSampleSize = 1;
-
-            if (currHeight > reqHeight || currWidth > reqWidth) {
-
-                final int halfHeight = currHeight / 2;
-                final int halfWidth = currWidth / 2;
-
-                // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-                // height and width larger than the requested height and width.
-                while ((halfHeight / inSampleSize) >= reqHeight
-                        && (halfWidth / inSampleSize) >= reqWidth) {
-                    inSampleSize *= 2;
-                }
-            }
-
-            return inSampleSize;
-        }
-
         @Override
         protected void onPostExecute(Bitmap bitmap){
             if(bitmap != null && cardViewReference != null){
@@ -152,5 +155,25 @@ public class WallpaperImage{
             }
         }
     }
+
+    public int calculateInSampleSize(int currWidth, int currHeight, int reqWidth, int reqHeight) {
+        int inSampleSize = 1;
+
+        if (currHeight > reqHeight || currWidth > reqWidth) {
+
+            final int halfHeight = currHeight / 2;
+            final int halfWidth = currWidth / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
 
 }

@@ -324,6 +324,7 @@ public class MainActivity extends AppCompatActivity{
 
             int waittime = currentMiscPrefs.getInt(getString(R.string.prefs_showPictureTime), 30);
             boolean detectGestures = currentMiscPrefs.getBoolean(getString(R.string.prefs_detectGestures), true);
+            boolean lockWallpaper = currentMiscPrefs.getBoolean(getString(R.string.prefs_lockwallpaper), true);
 
             /**
              * DELETE THE PREFERENCES
@@ -341,6 +342,7 @@ public class MainActivity extends AppCompatActivity{
                     .edit()
                     .putInt(getString(R.string.prefs_showPictureTime), waittime)
                     .putBoolean(getString(R.string.prefs_detectGestures), detectGestures)
+                    .putBoolean(getString(R.string.prefs_lockwallpaper), lockWallpaper)
                     .apply();
         }
 

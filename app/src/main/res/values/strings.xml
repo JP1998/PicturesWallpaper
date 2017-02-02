@@ -1,10 +1,11 @@
 <!--
-  ~      Copyright 2016 Jean-Pierre Hotz
+  ~     Copyright 2017 Jean-Pierre Hotz
+  ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
   ~
-  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~     http://www.apache.org/licenses/LICENSE-2.0
   ~
   ~ Unless required by applicable law or agreed to in writing, software
   ~ distributed under the License is distributed on an "AS IS" BASIS,
@@ -68,5 +69,7 @@
     <string name="dialog_ok">Ok</string>
     <string name="dialog_fuckyou">Fuck you!</string>
     <string name="dialog_fuckyou_answer">I love you too :*</string>
+    <string name="prefs_lockwallpaper">furtherSettings_SwipeToSwitchWallpaper_Switch.setChecked(miscprefs.getBoolean(getString(R.string.prefs_lockwallpaper), true));</string>
+    <string name="furthersettings_lockwallpaper_hint">Lock the wallpaper in place? (If not up- and down-swipes with two fingers will switch the wallpaper)</string>
 
 </resources>
