@@ -56,17 +56,6 @@ public class WallpaperImage{
 
     public void loadImage(Context ctx){
         if(mImage == null){
-            /*
-            BitmapFactory.Options opt = new BitmapFactory.Options();
-            opt.inSampleSize = calculateInSampleSize(x, y, SAMPLE_WIDTH, SAMPLE_HEIGHT);
-            opt.inJustDecodeBounds = false;
-            return BitmapFactory.decodeFile(mPath, opt);
-             */
-
-//            Bitmap immutableBitMap = BitmapFactory.decodeFile(mPath);
-//            // make the loaded Bitmap to be mutable :)
-//            Bitmap mImage = immutableBitMap.copy(Bitmap.Config.ARGB_8888, true);
-
             DisplayMetrics display = new DisplayMetrics();
             ((WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(display);
 

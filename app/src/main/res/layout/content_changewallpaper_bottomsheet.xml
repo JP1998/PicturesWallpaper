@@ -102,6 +102,15 @@
             android:layout_below="@id/furthersettings_swipetoswitch_switch"
             android:id="@+id/furthersettings_swipetoswitchwallpaper_switch"/>
 
+        <de.jeanpierrehotz.severalpictureswallpaper.views.color.ColorView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/furthersettings_fallbackcolor_colorview"
+            app:cv_initialcolor="#ff0000"
+            app:cv_description="The color to use as your background if there is no image in this wallpaper."
+            app:cv_caption=""
+            android:layout_below="@+id/furthersettings_swipetoswitchwallpaper_switch"/>
+
     </RelativeLayout>
 
 </LinearLayout>

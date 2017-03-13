@@ -45,6 +45,7 @@ import java.util.Locale;
 
 import de.jeanpierrehotz.severalpictureswallpaper.utils.WallpaperPictureSelector;
 import de.jeanpierrehotz.severalpictureswallpaper.views.WallpaperImageAdapter;
+import de.jeanpierrehotz.severalpictureswallpaper.views.color.ColorView;
 import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImage;
 import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImageManager;
 
@@ -67,6 +68,9 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
     private Switch furtherSettings_SwipeToSwitch_Switch;
     private Switch furtherSettings_SwipeToSwitchWallpaper_Switch;
 
+    private ColorView furtherSettings_Fallbackcolor_ColorView;
+    private int fallbackcolor;
+
     // Listener
     private SeekBar.OnSeekBarChangeListener furtherSettings_Value_SeekBar_OnChangeListener = new SeekBar.OnSeekBarChangeListener(){
         @Override
@@ -77,6 +81,13 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
         public void onStartTrackingTouch(SeekBar seekBar){}
         @Override
         public void onStopTrackingTouch(SeekBar seekBar){}
+    };
+
+    private ColorView.OnColorChangedListener furtherSettings_Fallbackcolor_ColorView_OnColorChangedListener = new ColorView.OnColorChangedListener() {
+        @Override
+        public void onColorChanged(int color, boolean finalvalue) {
+            fallbackcolor = color;
+        }
     };
 
     ///
@@ -174,6 +185,9 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
 
         furtherSettings_SwipeToSwitchWallpaper_Switch = (Switch) findViewById(R.id.furthersettings_swipetoswitchwallpaper_switch);
 
+        furtherSettings_Fallbackcolor_ColorView = (ColorView) findViewById(R.id.furthersettings_fallbackcolor_colorview);
+        furtherSettings_Fallbackcolor_ColorView.setOnColorChangedListener(furtherSettings_Fallbackcolor_ColorView_OnColorChangedListener);
+
         mWallpaperSelector = new WallpaperPictureSelector(this);
         mWallpaperSelector.setCallback(mWallpaperSelectorCallback);
 
@@ -194,11 +208,13 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
 
         furtherSettings_Value_SeekBar.setProgress(0);
         furtherSettings_Value_SeekBar.setProgress(1);
+
         furtherSettings_Value_SeekBar.setProgress(miscprefs.getInt(getString(R.string.prefs_showPictureTime), 60));
-
         furtherSettings_SwipeToSwitch_Switch.setChecked(miscprefs.getBoolean(getString(R.string.prefs_detectGestures), true));
-
         furtherSettings_SwipeToSwitchWallpaper_Switch.setChecked(miscprefs.getBoolean(getString(R.string.prefs_lockwallpaper), true));
+
+        fallbackcolor = miscprefs.getInt(getString(R.string.prefs_fallbackcolor), 0xFF000000);
+        furtherSettings_Fallbackcolor_ColorView.setColor(fallbackcolor);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener(){
@@ -283,6 +299,7 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
                 .putInt(getString(R.string.prefs_showPictureTime), furtherSettings_Value_SeekBar.getProgress())
                 .putBoolean(getString(R.string.prefs_detectGestures), furtherSettings_SwipeToSwitch_Switch.isChecked())
                 .putBoolean(getString(R.string.prefs_lockwallpaper), furtherSettings_SwipeToSwitchWallpaper_Switch.isChecked())
+                .putInt(getString(R.string.prefs_fallbackcolor), fallbackcolor)
                 .apply();
     }
 

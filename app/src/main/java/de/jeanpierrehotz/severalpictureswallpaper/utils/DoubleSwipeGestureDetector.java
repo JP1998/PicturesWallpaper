@@ -92,7 +92,6 @@ public class DoubleSwipeGestureDetector {
     }
 
     private void fireLeftSwipe() {
-        System.out.println("Swiped left.");
         if (!this.mEventFired && this.mOnDoubleLeftSwipeListener != null) {
             this.mEventFired = true;
             this.mOnDoubleLeftSwipeListener.onDoubleLeftSwiped();
@@ -100,7 +99,6 @@ public class DoubleSwipeGestureDetector {
     }
 
     private void fireRightSwipe() {
-        System.out.println("Swiped right.");
         if (!this.mEventFired && this.mOnDoubleRightSwipeListener != null) {
             this.mEventFired = true;
             this.mOnDoubleRightSwipeListener.onDoubleRightSwiped();
@@ -108,7 +106,6 @@ public class DoubleSwipeGestureDetector {
     }
 
     private void fireUpSwipe() {
-        System.out.println("Swiped up.");
         if (!this.mEventFired && this.mOnDoubleUpSwipeListener != null) {
             this.mEventFired = true;
             this.mOnDoubleUpSwipeListener.onDoubleUpSwiped();
@@ -116,7 +113,6 @@ public class DoubleSwipeGestureDetector {
     }
 
     private void fireDownSwipe() {
-        System.out.println("Swiped down.");
         if (!this.mEventFired && this.mOnDoubleDownSwipeListener != null) {
             this.mEventFired = true;
             this.mOnDoubleDownSwipeListener.onDoubleDownSwiped();
@@ -127,7 +123,6 @@ public class DoubleSwipeGestureDetector {
         this.mDoubleDown = evt.getPointerCount() == 2;
 
         if (!this.mDoubleDown) {
-//            System.out.println("Pointer count: " + evt.getPointerCount());
 
             this.mEventFired = evt.getPointerCount() > 2;
             this.valid = evt.getPointerCount() < 2;
@@ -142,6 +137,7 @@ public class DoubleSwipeGestureDetector {
             this.mPrevDelta1.setPosition(0.0f, 0.0f);
 
         } else if (evt.getAction() == MotionEvent.ACTION_UP || evt.getActionMasked() == MotionEvent.ACTION_POINTER_UP) {
+
             if (this.valid) {
 
                 float deltaX = ((this.mFirst0.getX() - evt.getX(0)) + (this.mFirst1.getX() - evt.getX(1))) / 2.0f;
@@ -171,7 +167,6 @@ public class DoubleSwipeGestureDetector {
                     fireDownSwipe();
                 }
             } else {
-                System.out.println("Invalid swipe.");
                 this.valid = true;
             }
 

@@ -17,6 +17,8 @@
 package de.jeanpierrehotz.severalpictureswallpaper;
 
 import android.app.AlertDialog;
+import android.app.WallpaperManager;
+import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -40,11 +42,13 @@ import com.prolificinteractive.chandelier.widget.Ornament;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import de.jeanpierrehotz.severalpictureswallpaper.utils.FileOrganizer;
 import de.jeanpierrehotz.severalpictureswallpaper.views.ColoredSnackbar;
 import de.jeanpierrehotz.severalpictureswallpaper.views.WallpaperNameAdapter;
 import de.jeanpierrehotz.severalpictureswallpaper.views.WallpaperNameViewHolder;
+import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.SeveralPicturesWallpaperService;
 import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImage;
 import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImageManager;
 
@@ -158,19 +162,15 @@ public class MainActivity extends AppCompatActivity{
 
         initializeLayout();
 
-        if(FileOrganizer.keep(this, WallpaperImageManager.getUsedImageFiles(this))){
-            ColoredSnackbar.make(Color.WHITE, settingsList, "Successfully organized app files.", Snackbar.LENGTH_LONG).show();
-        } else {
-            ColoredSnackbar.make(Color.WHITE, settingsList, "Something went wrong while organizing the app files.", Snackbar.LENGTH_LONG).show();
-        }
+        int deletedFiles = FileOrganizer.keep(this, WallpaperImageManager.getUsedImageFiles(this));
 
-//        exampleListView = (ListView) findViewById(R.id.settingsListView);
-//        ad = new SettingsAdapter(this, R.layout.layout_listitem_setting, settings_caption, selectedSetting);
-//
-//        exampleListView.setAdapter(ad);
-//
-//        exampleListView.setOnItemClickListener(changeSettingListener);
-//        exampleListView.setOnItemLongClickListener(createContextMenuListener);
+        if(deletedFiles != -1){
+            if(deletedFiles > 0){
+                ColoredSnackbar.make(Color.WHITE, settingsList, String.format(Locale.getDefault(), getString(R.string.managefiles_success), deletedFiles), Snackbar.LENGTH_LONG).show();
+            }
+        } else {
+            ColoredSnackbar.make(Color.WHITE, settingsList, getString(R.string.managefiles_error), Snackbar.LENGTH_LONG).show();
+        }
     }
 
     private void initializeLayout(){
@@ -284,7 +284,6 @@ public class MainActivity extends AppCompatActivity{
                     .setNegativeButton(R.string.dialog_abort, null)
                     .show();
         }
-
     }
 
     private void loadSettings(){
@@ -325,24 +324,25 @@ public class MainActivity extends AppCompatActivity{
             int waittime = currentMiscPrefs.getInt(getString(R.string.prefs_showPictureTime), 30);
             boolean detectGestures = currentMiscPrefs.getBoolean(getString(R.string.prefs_detectGestures), true);
             boolean lockWallpaper = currentMiscPrefs.getBoolean(getString(R.string.prefs_lockwallpaper), true);
+            int fallbackcolor = currentMiscPrefs.getInt(getString(R.string.prefs_fallbackcolor), 0xFF54D850);
 
             /**
              * DELETE THE PREFERENCES
              */
-
             currentMiscPrefs.edit().clear().apply();
             getSharedPreferences(getString(R.string.preferencecode_wallpaperimages) + settings_indexes.get(i), MODE_PRIVATE).edit().clear().apply();
 
             /**
              * AND SAVE THE VALUES AT THE NEW INDEX:
              */
-            WallpaperImageManager.saveToSharedPreferences(imgs, getSharedPreferences(getString(R.string.preferencecode_wallpaperimages) + settings_indexes.get(i), MODE_PRIVATE));
+            WallpaperImageManager.saveToSharedPreferences(imgs, getSharedPreferences(getString(R.string.preferencecode_wallpaperimages) + i, MODE_PRIVATE));
 
             getSharedPreferences(getString(R.string.preferencecode_miscellanous) + i, MODE_PRIVATE)
                     .edit()
                     .putInt(getString(R.string.prefs_showPictureTime), waittime)
                     .putBoolean(getString(R.string.prefs_detectGestures), detectGestures)
                     .putBoolean(getString(R.string.prefs_lockwallpaper), lockWallpaper)
+                    .putInt(getString(R.string.prefs_fallbackcolor), fallbackcolor)
                     .apply();
         }
 
@@ -390,6 +390,21 @@ public class MainActivity extends AppCompatActivity{
             startActivity(reviewIntroIntent);
 
             return true;
+        } else if(id == R.id.menu_main_setwallpaper){
+            Intent i = new Intent();
+
+            if(Build.VERSION.SDK_INT > 15) {
+                i.setAction(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
+
+                String pkg = this.getPackageName();
+                String cls = SeveralPicturesWallpaperService.class.getCanonicalName();
+
+                i.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(pkg, cls));
+            } else {
+                i.setAction(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER);
+            }
+
+            startActivityForResult(i, 0);
         }
 
 //        else if(id == R.id.menu_main_about){
