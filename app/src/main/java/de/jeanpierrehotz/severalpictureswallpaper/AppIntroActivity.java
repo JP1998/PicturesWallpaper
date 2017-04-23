@@ -84,7 +84,7 @@ public class AppIntroActivity extends IntroActivity {
         addSlide(
                 new SoftPermissionSlide.Builder()
                         .title(R.string.appIntro_doneWithIntro_caption)
-                        .description((firstLaunch)? R.string.appIntro_doneWithIntro_description: R.string.appIntro_review_doneWithIntro_description)
+                        .description((firstLaunch) ? R.string.appIntro_doneWithIntro_description : R.string.appIntro_review_doneWithIntro_description)
                         .image(R.drawable.appintro_donewithintropicture)
                         .background(R.color.intro)
                         .build()
@@ -100,8 +100,8 @@ public class AppIntroActivity extends IntroActivity {
      * This method starts the first setting if this activity was started as a result of the
      * first app-launch
      */
-    private void startFirstSetting(){
-        if(firstLaunch){
+    private void startFirstSetting() {
+        if (firstLaunch) {
             Intent intent = new Intent(this, ChangeWallpaperActivity.class);
             intent.putExtra(getString(R.string.prefs_wallpaperindex), 0); //we need to give it the settings index
             startActivity(intent);

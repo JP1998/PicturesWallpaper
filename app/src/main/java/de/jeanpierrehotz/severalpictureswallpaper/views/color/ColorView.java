@@ -70,12 +70,12 @@ public class ColorView extends LinearLayout implements View.OnClickListener, Col
         captionTextView = (TextView) findViewById(R.id.layout_colorview_captiontext);
         descriptionTextView = (TextView) findViewById(R.id.layout_colorview_descriptiontext);
 
-        if(!isInEditMode()) {
+        if (!isInEditMode()) {
             colorDialog = createColorDialog();
             colorDialog.setOnColorChangedListener(this);
         }
 
-        if(attr != null) {
+        if (attr != null) {
             try {
                 setColor(attr.getColor(R.styleable.ColorView_cv_initialcolor, 0xFF54D850));
                 setCaption(attr.getString(R.styleable.ColorView_cv_caption));
@@ -134,7 +134,7 @@ public class ColorView extends LinearLayout implements View.OnClickListener, Col
     public void onColorChanged(int color, boolean finalvalue) {
         colorShower.setColor(color);
 
-        if(listener != null) {
+        if (listener != null) {
             listener.onColorChanged(color, finalvalue);
         }
     }

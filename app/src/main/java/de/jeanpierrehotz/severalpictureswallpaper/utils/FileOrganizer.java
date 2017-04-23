@@ -28,13 +28,14 @@ import java.util.List;
  */
 public class FileOrganizer {
 
-    private FileOrganizer() {}
+    private FileOrganizer() {
+    }
 
     /**
      * This method gives you the possibility to delete all the files in the apps internal storage while
      * keeping all the files still needed. The files still needed are thus to be given in filesToKeep.
      *
-     * @param ctx The Context to be able to delete all the files
+     * @param ctx         The Context to be able to delete all the files
      * @param filesToKeep a list of all the files to keep
      * @return the amount of files deleted; -1 if there were any errors
      */
@@ -71,7 +72,7 @@ public class FileOrganizer {
      * @return the list of all the files within the directory and all its subdirectories
      */
     private static List<String> listFiles(File f) {
-        if(f.isDirectory()) {
+        if (f.isDirectory()) {
             List<String> filePaths = new ArrayList<>();
             for (File currentFile : f.listFiles()) {
                 if (currentFile.isDirectory()) {

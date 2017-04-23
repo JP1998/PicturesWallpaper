@@ -56,14 +56,14 @@ public class ColorShowerView extends View {
         initialise(context.getTheme().obtainStyledAttributes(attrs, R.styleable.ColorShowerView, defStyleAttr, defStyleRes));
     }
 
-    private void initialise(TypedArray attr){
+    private void initialise(TypedArray attr) {
         mBorderPaint = new Paint();
         mBorderPaint.setStyle(Paint.Style.STROKE);
 
         mColorPaint = new Paint();
         mColorPaint.setStyle(Paint.Style.FILL);
 
-        if(attr != null) {
+        if (attr != null) {
             try {
                 setColor(attr.getColor(R.styleable.ColorShowerView_cs_initialColor, 0xFF54D850));
                 setBorderColor(attr.getColor(R.styleable.ColorShowerView_cs_borderColor, 0xFFA2A2A2));
@@ -74,22 +74,22 @@ public class ColorShowerView extends View {
         }
     }
 
-    public void setColor(int color){
+    public void setColor(int color) {
         mColorPaint.setColor(color);
         invalidate();
     }
 
-    public int getColor(){
+    public int getColor() {
         return mColorPaint.getColor();
     }
 
-    public void setBorderColor(int color){
+    public void setBorderColor(int color) {
         mBorderPaint.setColor(color);
         invalidate();
         requestLayout();
     }
 
-    public int getBorderColor(){
+    public int getBorderColor() {
         return mBorderPaint.getColor();
     }
 
@@ -99,7 +99,7 @@ public class ColorShowerView extends View {
         requestLayout();
     }
 
-    public float getBorderStroke(){
+    public float getBorderStroke() {
         return mBorderPaint.getStrokeWidth();
     }
 

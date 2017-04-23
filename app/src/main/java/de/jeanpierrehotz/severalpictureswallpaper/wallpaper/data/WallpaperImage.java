@@ -36,7 +36,7 @@ import java.util.Locale;
 /**
  *
  */
-public class WallpaperImage{
+public class WallpaperImage {
 
     private static final int SAMPLE_WIDTH = 450;
     private static final int SAMPLE_HEIGHT = 800;
@@ -50,12 +50,12 @@ public class WallpaperImage{
     private int x;
     private int y;
 
-    public WallpaperImage(String path){
+    public WallpaperImage(String path) {
         mPath = path;
     }
 
-    public void loadImage(Context ctx){
-        if(mImage == null){
+    public void loadImage(Context ctx) {
+        if (mImage == null) {
             DisplayMetrics display = new DisplayMetrics();
             ((WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(display);
 
@@ -65,13 +65,18 @@ public class WallpaperImage{
 
             mImage = BitmapFactory.decodeFile(mPath, opt);
 
-            x = mImage.getWidth();
-            y = mImage.getHeight();
+            if (mImage != null) {
+                x = mImage.getWidth();
+                y = mImage.getHeight();
+            } else {
+                x = 0;
+                y = 0;
+            }
         }
     }
 
-    public void loadAsPreview(CardView toLoadTo){
-        if(mImage == null){
+    public void loadAsPreview(CardView toLoadTo) {
+        if (mImage == null) {
             BitmapFactory.Options opt = new BitmapFactory.Options();
             opt.inJustDecodeBounds = true;
             BitmapFactory.decodeFile(mPath, opt);
@@ -84,38 +89,44 @@ public class WallpaperImage{
         }
     }
 
-    public void releaseImage(){
-        if(mImage != null){
+    public void releaseImage() {
+        if (mImage != null) {
             mImage.recycle();
             mImage = null;
         }
     }
 
-    public String getResolution(){
-        if(mImage != null || (x != 0 && y != 0)){
+    public String getResolution() {
+        if (mImage != null || (x != 0 && y != 0)) {
             return String.format(Locale.getDefault(), "%1$d x %2$dpx", x, y);
-        }else{
+        } else {
             return "0 x 0px";
         }
     }
 
-    public String getFileName(){
+    public String getFileName() {
         return mPath.substring(mPath.lastIndexOf("/") + 1, mPath.lastIndexOf("."));
     }
 
-    String getPath(){
-        return mPath;
+    String getPath() {
+        return this.mPath;
     }
 
-    public void drawImage(float x, float y, Canvas c, Paint p){
-        c.drawBitmap(mImage, new Rect(0, 0, mImage.getWidth(), mImage.getHeight()), new RectF(0, 0, x, y), p);
+    public boolean drawable() {
+        return this.mImage != null;
     }
 
-    private class PreviewLoaderTask extends AsyncTask<Integer, Void, Bitmap>{
+    public void drawImage(float x, float y, Canvas c, Paint p) {
+        if (this.mImage != null) {
+            c.drawBitmap(mImage, new Rect(0, 0, mImage.getWidth(), mImage.getHeight()), new RectF(0, 0, x, y), p);
+        }
+    }
+
+    private class PreviewLoaderTask extends AsyncTask<Integer, Void, Bitmap> {
 
         private CardView cardViewReference;
 
-        public PreviewLoaderTask(CardView v){
+        public PreviewLoaderTask(CardView v) {
             cardViewReference = v;
         }
 
@@ -124,11 +135,12 @@ public class WallpaperImage{
          * 1 -> currY
          * 2 -> targetX
          * 3 -> targetY
+         *
          * @param integers asd
          * @return asd
          */
         @Override
-        protected Bitmap doInBackground(Integer... integers){
+        protected Bitmap doInBackground(Integer... integers) {
             BitmapFactory.Options opt = new BitmapFactory.Options();
             opt.inSampleSize = calculateInSampleSize(x, y, SAMPLE_WIDTH, SAMPLE_HEIGHT);
             opt.inJustDecodeBounds = false;
@@ -136,8 +148,8 @@ public class WallpaperImage{
         }
 
         @Override
-        protected void onPostExecute(Bitmap bitmap){
-            if(bitmap != null && cardViewReference != null){
+        protected void onPostExecute(Bitmap bitmap) {
+            if (bitmap != null && cardViewReference != null) {
                 mImage = bitmap;
                 cardViewReference.setImageDrawable(new BitmapDrawable(Resources.getSystem(), mImage));
                 cardViewReference = null;

@@ -30,12 +30,11 @@ import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImage;
 /**
  *
  */
-public class WallpaperImageViewHolder extends RecyclerView.ViewHolder{
+public class WallpaperImageViewHolder extends RecyclerView.ViewHolder {
 
     private CardView mRootCardView;
-    private int position;
 
-    public WallpaperImageViewHolder(View itemView){
+    public WallpaperImageViewHolder(View itemView) {
         super(itemView);
 
         mRootCardView = (CardView) itemView.findViewById(R.id.cardview_item_root);
@@ -47,16 +46,10 @@ public class WallpaperImageViewHolder extends RecyclerView.ViewHolder{
         tv0.setSingleLine(true);
     }
 
-    public void onBind(int pos, WallpaperImage img){
-        position = pos;
-
+    public void onBind(WallpaperImage img) {
         img.loadAsPreview(mRootCardView);
         mRootCardView.setTitle(img.getFileName());
         mRootCardView.setDescription(img.getResolution());
-    }
-
-    public int getNumber(){
-        return position;
     }
 
 }

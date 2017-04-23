@@ -1,3 +1,19 @@
+/*
+ *     Copyright 2017 Jean-Pierre Hotz
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package de.jeanpierrehotz.severalpictureswallpaper.utils;
 
 import android.annotation.TargetApi;
@@ -39,7 +55,7 @@ public class WallpaperPictureSelector {
     private int mAspectX = -1;
     private int mAspectY = -1;
 
-    public WallpaperPictureSelector(final Context ctx){
+    public WallpaperPictureSelector(final Context ctx) {
         mContext = ctx;
         calculateDisplayAspect();
     }
@@ -121,8 +137,8 @@ public class WallpaperPictureSelector {
         activity.startActivityForResult(intent, SELECT_PIC);
     }
 
-    private void handleSelectedResult(String fileName){
-        File f= new File(fileName);
+    private void handleSelectedResult(String fileName) {
+        File f = new File(fileName);
         if (f.exists()) {
             File outputFile = CommonUtils.generateExternalImageCacheFile(mContext, ".jpg");
             CommonUtils.copy(new File(fileName), outputFile);
@@ -138,20 +154,20 @@ public class WallpaperPictureSelector {
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-    private void calculateDisplayAspect(){
+    private void calculateDisplayAspect() {
         Point p = new Point();
-        if(mContext instanceof Activity){
+        if (mContext instanceof Activity) {
             ((Activity) mContext).getWindowManager().getDefaultDisplay().getRealSize(p);
             double ratio = (double) p.x / (double) p.y;
 
             int ctr = 1;
-            while(Math.abs(Math.round(ratio * ctr) - (ratio * ctr)) > 0.001d){
+            while (Math.abs(Math.round(ratio * ctr) - (ratio * ctr)) > 0.001d) {
                 ctr++;
             }
 
             mAspectY = ctr;
             mAspectX = (int) (ctr * ratio);
-        }else{
+        } else {
             mAspectX = 9;
             mAspectY = 16;
         }
@@ -203,14 +219,15 @@ public class WallpaperPictureSelector {
         }
     }
 
-    public enum CropResult{
+    public enum CropResult {
         success,
         illegal_input,
         illegal_output
     }
 
-    public interface Callback{
+    public interface Callback {
         void onSelectedResult(String file);
+
         void onCropperResult(CropResult result, File srcFile, File outFile);
     }
 
@@ -218,26 +235,26 @@ public class WallpaperPictureSelector {
     /*
      * Dumb classes I don't want but need to keep everything in "one" class :(
      */
-    private static class Compatibility{
+    private static class Compatibility {
         @TargetApi(Build.VERSION_CODES.KITKAT)
-        private static String getPath(final Context context, final Uri uri){
+        private static String getPath(final Context context, final Uri uri) {
 
             final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
             // DocumentProvider
-            if(isKitKat && DocumentsContract.isDocumentUri(context, uri)){
+            if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
                 // ExternalStorageProvider
-                if(isExternalStorageDocument(uri)){
+                if (isExternalStorageDocument(uri)) {
                     final String docId = DocumentsContract.getDocumentId(uri);
                     final String[] split = docId.split(":");
                     final String type = split[0];
 
-                    if("primary".equalsIgnoreCase(type)){
+                    if ("primary".equalsIgnoreCase(type)) {
                         return Environment.getExternalStorageDirectory() + "/" + split[1];
                     }
                 }
                 // DownloadsProvider
-                else if(isDownloadsDocument(uri)){
+                else if (isDownloadsDocument(uri)) {
 
                     final String id = DocumentsContract.getDocumentId(uri);
                     final Uri contentUri = ContentUris.withAppendedId(
@@ -246,17 +263,17 @@ public class WallpaperPictureSelector {
                     return getDataColumn(context, contentUri, null, null);
                 }
                 // MediaProvider
-                else if(isMediaDocument(uri)){
+                else if (isMediaDocument(uri)) {
                     final String docId = DocumentsContract.getDocumentId(uri);
                     final String[] split = docId.split(":");
                     final String type = split[0];
 
                     Uri contentUri = null;
-                    if("image".equals(type)){
+                    if ("image".equals(type)) {
                         contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-                    }else if("video".equals(type)){
+                    } else if ("video".equals(type)) {
                         contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-                    }else if("audio".equals(type)){
+                    } else if ("audio".equals(type)) {
                         contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
                     }
 
@@ -269,21 +286,22 @@ public class WallpaperPictureSelector {
                 }
             }
             // MediaStore (and general)
-            else if("content".equalsIgnoreCase(uri.getScheme())){
+            else if ("content".equalsIgnoreCase(uri.getScheme())) {
 
                 // Return the remote address
-                if(isGooglePhotosUri(uri))
+                if (isGooglePhotosUri(uri))
                     return uri.getLastPathSegment();
 
                 return getDataColumn(context, uri, null, null);
             }
             // File
-            else if("file".equalsIgnoreCase(uri.getScheme())){
+            else if ("file".equalsIgnoreCase(uri.getScheme())) {
                 return uri.getPath();
             }
 
             return null;
         }
+
         /**
          * Get the value of the data column for this Uri. This is useful for
          * MediaStore Uris, and other file-based ContentProviders.
@@ -295,7 +313,7 @@ public class WallpaperPictureSelector {
          * @return The value of the _data column, which is typically a file path.
          */
         public static String getDataColumn(Context context, Uri uri, String selection,
-                                           String[] selectionArgs){
+                                           String[] selectionArgs) {
 
             Cursor cursor = null;
             final String column = "_data";
@@ -303,50 +321,54 @@ public class WallpaperPictureSelector {
                     column
             };
 
-            try{
+            try {
                 cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
                         null);
-                if(cursor != null && cursor.moveToFirst()){
+                if (cursor != null && cursor.moveToFirst()) {
                     final int index = cursor.getColumnIndexOrThrow(column);
                     return cursor.getString(index);
                 }
-            }finally{
-                if(cursor != null)
+            } finally {
+                if (cursor != null)
                     cursor.close();
             }
             return null;
         }
+
         /**
          * @param uri The Uri to check.
          * @return Whether the Uri authority is ExternalStorageProvider.
          */
-        private static boolean isExternalStorageDocument(Uri uri){
+        private static boolean isExternalStorageDocument(Uri uri) {
             return "com.android.externalstorage.documents".equals(uri.getAuthority());
         }
+
         /**
          * @param uri The Uri to check.
          * @return Whether the Uri authority is DownloadsProvider.
          */
-        private static boolean isDownloadsDocument(Uri uri){
+        private static boolean isDownloadsDocument(Uri uri) {
             return "com.android.providers.downloads.documents".equals(uri.getAuthority());
         }
+
         /**
          * @param uri The Uri to check.
          * @return Whether the Uri authority is MediaProvider.
          */
-        public static boolean isMediaDocument(Uri uri){
+        public static boolean isMediaDocument(Uri uri) {
             return "com.android.providers.media.documents".equals(uri.getAuthority());
         }
+
         /**
          * @param uri The Uri to check.
          * @return Whether the Uri authority is Google Photos.
          */
-        public static boolean isGooglePhotosUri(Uri uri){
+        public static boolean isGooglePhotosUri(Uri uri) {
             return "com.google.android.apps.photos.content".equals(uri.getAuthority());
         }
     }
 
-    private static class CommonUtils{
+    private static class CommonUtils {
         private static boolean copy(File source, File dest) {
             BufferedInputStream bis = null;
             BufferedOutputStream bos = null;
@@ -374,15 +396,18 @@ public class WallpaperPictureSelector {
 
             return result;
         }
+
         private static File generateExternalImageCacheFile(Context context, String ext) {
             String fileName = "img_" + System.currentTimeMillis();
             return generateExternalImageCacheFile(context, fileName, ext);
         }
+
         private static File generateExternalImageCacheFile(Context context, String fileName, String ext) {
             File cacheDir = getExternalImageCacheDir(context);
             String path = cacheDir.getPath() + File.separator + fileName + ext;
             return new File(path);
         }
+
         private static File getExternalImageCacheDir(Context context) {
             File externalCacheDir = getExternalCacheDir(context);
             if (externalCacheDir != null) {
@@ -399,6 +424,7 @@ public class WallpaperPictureSelector {
             final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache" + "/image";
             return new File(cacheDir);
         }
+
         private static File getExternalCacheDir(Context context) {
             File file = context.getExternalCacheDir();
             if (file == null) {
@@ -409,7 +435,7 @@ public class WallpaperPictureSelector {
         }
     }
 
-    private static class ImageUtils{
+    private static class ImageUtils {
         private static void saveBitmap(Bitmap bmp, String filePath, Bitmap.CompressFormat format, int quality) {
             FileOutputStream fo;
             try {

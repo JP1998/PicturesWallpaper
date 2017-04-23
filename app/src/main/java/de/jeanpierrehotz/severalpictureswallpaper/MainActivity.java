@@ -52,7 +52,7 @@ import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.SeveralPicturesWallp
 import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImage;
 import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImageManager;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     private ArrayList<String> settings_caption;
     private ArrayList<Integer> settings_indexes;
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity{
     private AlertDialog dialog;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity{
         settings_indexes = new ArrayList<>();
         deleted = false;
 
-        if(getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE).getBoolean(getString(R.string.prefs_firstLaunch), true)){
+        if (getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE).getBoolean(getString(R.string.prefs_firstLaunch), true)) {
             getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE).edit().putBoolean(getString(R.string.prefs_firstLaunch), false).apply();
 
             settings_caption.add(getString(R.string.firstSettingName));
@@ -91,27 +91,27 @@ public class MainActivity extends AppCompatActivity{
             Intent firstLaunchIntent = new Intent(this, AppIntroActivity.class);
             firstLaunchIntent.putExtra(getString(R.string.prefs_firstLaunch), true);
             startActivity(firstLaunchIntent);
-        }else{
+        } else {
             loadSettings();
         }
 
         initializeLayout();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        if(fab != null){
-            fab.setOnClickListener(new View.OnClickListener(){
+        if (fab != null) {
+            fab.setOnClickListener(new View.OnClickListener() {
                 AlertDialog dialog;
 
                 @Override
-                public void onClick(View view){
+                public void onClick(View view) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         settings_caption.add("");
 
                         dialog = new AlertDialog.Builder(MainActivity.this)
                                 .setTitle(R.string.selectTitle_caption)
-                                .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener(){
+                                .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialogInterface, int hay){
+                                    public void onClick(DialogInterface dialogInterface, int hay) {
                                         EditText newNameET = (EditText) dialog.findViewById(R.id.dialog_newwallpaper_newnameEditText);
                                         settings_caption.set(settings_caption.size() - 1, newNameET.getText().toString());
 
@@ -121,9 +121,9 @@ public class MainActivity extends AppCompatActivity{
                                         modifySetting(settings_caption.size() - 1);
                                     }
                                 })
-                                .setNegativeButton(R.string.dialog_abort, new DialogInterface.OnClickListener(){
+                                .setNegativeButton(R.string.dialog_abort, new DialogInterface.OnClickListener() {
                                     @Override
-                                    public void onClick(DialogInterface dialogInterface, int i){
+                                    public void onClick(DialogInterface dialogInterface, int i) {
                                         settings_caption.remove(settings_caption.size() - 1);
                                     }
                                 })
@@ -136,22 +136,27 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    public void showCurrentAction(){
+    public void showCurrentAction() {
         ColoredSnackbar.make(Color.WHITE, settingsList, getActionString(), Snackbar.LENGTH_LONG).show();
     }
 
-    private String getActionString(){
-        switch(action){
-            case 0: return getString(R.string.actionstring_edit);
-            case 1: return getString(R.string.actionstring_select);
-            case 2: return getString(R.string.actionstring_rename);
-            case 3: return getString(R.string.actionstring_delete);
-            default: return getString(R.string.actionstring_fucku);
+    private String getActionString() {
+        switch (action) {
+            case 0:
+                return getString(R.string.actionstring_edit);
+            case 1:
+                return getString(R.string.actionstring_select);
+            case 2:
+                return getString(R.string.actionstring_rename);
+            case 3:
+                return getString(R.string.actionstring_delete);
+            default:
+                return getString(R.string.actionstring_fucku);
         }
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
 
         settings_caption = new ArrayList<>();
@@ -164,8 +169,8 @@ public class MainActivity extends AppCompatActivity{
 
         int deletedFiles = FileOrganizer.keep(this, WallpaperImageManager.getUsedImageFiles(this));
 
-        if(deletedFiles != -1){
-            if(deletedFiles > 0){
+        if (deletedFiles != -1) {
+            if (deletedFiles > 0) {
                 ColoredSnackbar.make(Color.WHITE, settingsList, String.format(Locale.getDefault(), getString(R.string.managefiles_success), deletedFiles), Snackbar.LENGTH_LONG).show();
             }
         } else {
@@ -173,7 +178,7 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    private void initializeLayout(){
+    private void initializeLayout() {
         settingsList = (RecyclerView) findViewById(R.id.wallpapersList);
         settingsLayoutManager = new LinearLayoutManager(this);
         settingsList.setLayoutManager(settingsLayoutManager);
@@ -183,10 +188,10 @@ public class MainActivity extends AppCompatActivity{
         settingsAdapter = new WallpaperNameAdapter(this, settings_caption, selectedSetting);
         settingsList.setAdapter(settingsAdapter);
 
-        settingsAdapter.setOnItemClickListener(new WallpaperNameAdapter.OnItemClickListener(){
+        settingsAdapter.setOnItemClickListener(new WallpaperNameAdapter.OnItemClickListener() {
             @Override
-            public void onItemClicked(WallpaperNameViewHolder vh, int pos){
-                switch(action){
+            public void onItemClicked(WallpaperNameViewHolder vh, int pos) {
+                switch (action) {
                     case 0:
                         modifySetting(pos);
                         break;
@@ -203,9 +208,9 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-        swipeActionLayout.setOnActionSelectedListener(new ChandelierLayout.OnActionListener(){
+        swipeActionLayout.setOnActionSelectedListener(new ChandelierLayout.OnActionListener() {
             @Override
-            public void onActionSelected(int index, Ornament act){
+            public void onActionSelected(int index, Ornament act) {
                 action = index;
                 showCurrentAction();
             }
@@ -219,23 +224,23 @@ public class MainActivity extends AppCompatActivity{
         ));
     }
 
-    private void modifySetting(int i){
+    private void modifySetting(int i) {
         Intent intent = new Intent(this, ChangeWallpaperActivity.class);
         intent.putExtra(getString(R.string.prefs_wallpaperindex), i);
         startActivity(intent);
     }
 
-    private void selectSetting(int i){
+    private void selectSetting(int i) {
         settingsAdapter.notifySelectedChanged(selectedSetting = i);
     }
 
-    private void renameSettings(final int i){
+    private void renameSettings(final int i) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             dialog = new AlertDialog.Builder(MainActivity.this)
                     .setTitle(R.string.selectTitle_caption)
-                    .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener(){
+                    .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int hay){
+                        public void onClick(DialogInterface dialogInterface, int hay) {
                             EditText newNameET = (EditText) dialog.findViewById(R.id.dialog_newwallpaper_newnameEditText);
                             settings_caption.set(i, newNameET.getText().toString());
                             settingsAdapter.notifyDataSetChanged();
@@ -250,33 +255,33 @@ public class MainActivity extends AppCompatActivity{
         newNameET.setText(settings_caption.get(i));
     }
 
-    private void deleteSetting(final int index){
-        if(index == selectedSetting){
+    private void deleteSetting(final int index) {
+        if (index == selectedSetting) {
             dialog = new AlertDialog.Builder(MainActivity.this)
                     .setTitle(R.string.deleteChosenSetting_caption)
                     .setMessage(R.string.deleteChosenSetting_message)
                     .setPositiveButton(R.string.dialog_ok, null)
-                    .setNegativeButton(R.string.dialog_fuckyou, new DialogInterface.OnClickListener(){
+                    .setNegativeButton(R.string.dialog_fuckyou, new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i){
+                        public void onClick(DialogInterface dialogInterface, int i) {
                             ColoredSnackbar.make(Color.WHITE, settingsList, R.string.dialog_fuckyou_answer, Snackbar.LENGTH_INDEFINITE).show();
                         }
                     })
                     .show();
-        }else{
+        } else {
             dialog = new AlertDialog.Builder(MainActivity.this)
                     .setTitle(R.string.deleteWallpaper_caption)
                     .setMessage(R.string.deleteWallpaper_description)
-                    .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener(){
+                    .setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialogInterface, int i){
+                        public void onClick(DialogInterface dialogInterface, int i) {
                             settings_caption.remove(index);
                             settings_indexes.remove(index);
                             deleted = true;
 
-                            if(index < selectedSetting){
+                            if (index < selectedSetting) {
                                 settingsAdapter.notifySelectedChanged(--selectedSetting);
-                            }else{
+                            } else {
                                 settingsAdapter.notifyDataSetChanged();
                             }
                         }
@@ -286,25 +291,25 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-    private void loadSettings(){
+    private void loadSettings() {
         SharedPreferences settingsPrefs = getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE);
         int length = settingsPrefs.getInt(getString(R.string.prefs_wallpapercount), 0);
 
-        for(int i = 0; i < length; i++){
+        for (int i = 0; i < length; i++) {
             settings_caption.add(settingsPrefs.getString(getString(R.string.prefs_wallpapername) + i, ""));
             settings_indexes.add(i);
         }
         selectedSetting = settingsPrefs.getInt(getString(R.string.prefs_wallpaperindex), 0);
     }
 
-    private void saveSettings(){
+    private void saveSettings() {
         boolean firsttime = getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE).getBoolean(getString(R.string.prefs_firstLaunch), true);
         SharedPreferences.Editor edit = getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE).edit();
         edit.clear()
                 .putInt(getString(R.string.prefs_wallpapercount), settings_caption.size())
                 .putBoolean(getString(R.string.prefs_firstLaunch), firsttime);
 
-        for(int i = 0; i < settings_caption.size(); i++){
+        for (int i = 0; i < settings_caption.size(); i++) {
             edit.putString(getString(R.string.prefs_wallpapername) + i, settings_caption.get(i));
         }
 
@@ -312,8 +317,8 @@ public class MainActivity extends AppCompatActivity{
         edit.apply();
     }
 
-    private void saveSettingChanges(){
-        for(int i = 0; i < settings_caption.size(); i++){
+    private void saveSettingChanges() {
+        for (int i = 0; i < settings_caption.size(); i++) {
             /**
              * LOAD THE SETTING AT THE PREVIOUS INDEX
              */
@@ -352,31 +357,31 @@ public class MainActivity extends AppCompatActivity{
          *  => Delete in [caption.length .. length[
          */
         int length = getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE).getInt(getString(R.string.prefs_wallpapercount), 0);
-        for(int i = settings_caption.size(); i < length; i++){
+        for (int i = settings_caption.size(); i < length; i++) {
             getSharedPreferences(getString(R.string.preferencecode_wallpaperimages) + i, MODE_PRIVATE).edit().clear().apply();
             getSharedPreferences(getString(R.string.preferencecode_miscellanous) + i, MODE_PRIVATE).edit().clear().apply();
         }
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
 
-        if(deleted){
+        if (deleted) {
             saveSettingChanges();
         }
         saveSettings();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -384,16 +389,16 @@ public class MainActivity extends AppCompatActivity{
 
         //noinspection SimplifiableIfStatement
 
-        if(id == R.id.menu_main_reviewappintro){
+        if (id == R.id.menu_main_reviewappintro) {
             Intent reviewIntroIntent = new Intent(this, AppIntroActivity.class);
             reviewIntroIntent.putExtra(getString(R.string.prefs_firstLaunch), false);
             startActivity(reviewIntroIntent);
 
             return true;
-        } else if(id == R.id.menu_main_setwallpaper){
+        } else if (id == R.id.menu_main_setwallpaper) {
             Intent i = new Intent();
 
-            if(Build.VERSION.SDK_INT > 15) {
+            if (Build.VERSION.SDK_INT > 15) {
                 i.setAction(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
 
                 String pkg = this.getPackageName();

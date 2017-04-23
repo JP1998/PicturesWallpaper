@@ -52,7 +52,7 @@ import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImageM
 /**
  *
  */
-public class ChangeWallpaperActivity extends AppCompatActivity{
+public class ChangeWallpaperActivity extends AppCompatActivity {
 
     ///
     /// BottomSheet
@@ -72,15 +72,19 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
     private int fallbackcolor;
 
     // Listener
-    private SeekBar.OnSeekBarChangeListener furtherSettings_Value_SeekBar_OnChangeListener = new SeekBar.OnSeekBarChangeListener(){
+    private SeekBar.OnSeekBarChangeListener furtherSettings_Value_SeekBar_OnChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
-        public void onProgressChanged(SeekBar seekBar, int i, boolean b){
+        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
             furtherSettings_Value_TextView.setText(String.format(Locale.getDefault(), "%1$.1fs", ((double) furtherSettings_Value_SeekBar.getProgress())));
         }
+
         @Override
-        public void onStartTrackingTouch(SeekBar seekBar){}
+        public void onStartTrackingTouch(SeekBar seekBar) {
+        }
+
         @Override
-        public void onStopTrackingTouch(SeekBar seekBar){}
+        public void onStopTrackingTouch(SeekBar seekBar) {
+        }
     };
 
     private ColorView.OnColorChangedListener furtherSettings_Fallbackcolor_ColorView_OnColorChangedListener = new ColorView.OnColorChangedListener() {
@@ -100,13 +104,9 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
     private RecyclerView.LayoutManager recyclerManager;
 
     // Listener
-    private WallpaperImageAdapter.OnItemNormalButtonClickListener recyclerNormalButtonClickListener = new WallpaperImageAdapter.OnItemNormalButtonClickListener(){
+    private WallpaperImageAdapter.OnItemNormalButtonClickListener recyclerNormalButtonClickListener = new WallpaperImageAdapter.OnItemNormalButtonClickListener() {
         @Override
-        public void onClick(RecyclerView.ViewHolder vh, int pos){
-//            images.get(pos).releaseImage();
-//            images.remove(pos);
-//            recyclerAdapter.notifyItemRemoved(pos);
-
+        public void onClick(RecyclerView.ViewHolder vh, int pos) {
             getSharedPreferences(getString(R.string.preferencecode_miscellanous) + wallpaperindex, MODE_PRIVATE)
                     .edit()
                     .putInt(getString(R.string.prefs_currentIndex), pos)
@@ -119,7 +119,7 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
     private ItemTouchHelper.Callback wallpaperImageHelperCallback = new ItemTouchHelper.Callback() {
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN,  ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
+            return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT);
         }
 
         @Override
@@ -137,8 +137,10 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
             int pos = viewHolder.getAdapterPosition();
 
+            WallpaperImage removed = images.get(pos);
             images.remove(pos);
             recyclerAdapter.notifyItemRemoved(pos);
+            removed.releaseImage();
         }
     };
 
@@ -149,13 +151,14 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
     private int wallpaperindex;
 
     private WallpaperPictureSelector mWallpaperSelector;
-    private WallpaperPictureSelector.Callback mWallpaperSelectorCallback = new WallpaperPictureSelector.Callback(){
+    private WallpaperPictureSelector.Callback mWallpaperSelectorCallback = new WallpaperPictureSelector.Callback() {
         @Override
-        public void onSelectedResult(String file){}
+        public void onSelectedResult(String file) {
+        }
 
         @Override
-        public void onCropperResult(WallpaperPictureSelector.CropResult result, File srcFile, File outFile){
-            if(result == WallpaperPictureSelector.CropResult.success){
+        public void onCropperResult(WallpaperPictureSelector.CropResult result, File srcFile, File outFile) {
+            if (result == WallpaperPictureSelector.CropResult.success) {
                 images.add(new WallpaperImage(outFile.getAbsolutePath()));
                 recyclerAdapter.notifyItemInserted(images.size() - 1);
             }
@@ -165,7 +168,7 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
     private List<WallpaperImage> images;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_changewallpaper);
 
@@ -217,9 +220,9 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
         furtherSettings_Fallbackcolor_ColorView.setColor(fallbackcolor);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener(){
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view){
+            public void onClick(View view) {
                 selectImage();
             }
         });
@@ -227,9 +230,9 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
 
     private static final int CODE_TRIED_SELECTING_IMAGE = 0x12345;
 
-    private void selectImage(){
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
-            requestPermissions(new String[]{ Manifest.permission.WRITE_EXTERNAL_STORAGE }, CODE_TRIED_SELECTING_IMAGE);
+    private void selectImage() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, CODE_TRIED_SELECTING_IMAGE);
             return;
         }
         mWallpaperSelector.selectImage(this);
@@ -239,27 +242,27 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if(requestCode == CODE_TRIED_SELECTING_IMAGE && grantResults.length >= 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == CODE_TRIED_SELECTING_IMAGE && grantResults.length >= 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             selectImage();
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_changewallpaper, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if(id == R.id.menu_changewallpaper_selectwallpaper){
+        if (id == R.id.menu_changewallpaper_selectwallpaper) {
             getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE)
                     .edit()
                     .putInt(getString(R.string.prefs_wallpaperindex), wallpaperindex)
@@ -271,7 +274,7 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mWallpaperSelector.onActivityResult(requestCode, resultCode, data);
     }
@@ -289,7 +292,7 @@ public class ChangeWallpaperActivity extends AppCompatActivity{
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
 
         WallpaperImageManager.saveToSharedPreferences(images, getSharedPreferences(getString(R.string.preferencecode_wallpaperimages) + wallpaperindex, MODE_PRIVATE));

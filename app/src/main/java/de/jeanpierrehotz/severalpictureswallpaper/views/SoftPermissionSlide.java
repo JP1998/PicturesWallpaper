@@ -21,7 +21,7 @@ import android.support.annotation.ColorRes;
 import com.heinrichreimersoftware.materialintro.slide.SimpleSlide;
 
 /**
- * Created by Jonny on 25.01.2017.
+ *
  */
 public class SoftPermissionSlide extends SimpleSlide {
 
@@ -41,7 +41,7 @@ public class SoftPermissionSlide extends SimpleSlide {
     public boolean canGoForward() {
         boolean goForwardEnforcingPermissions = super.canGoForward();
 
-        if(enforcePermissions){
+        if (enforcePermissions) {
             return goForwardEnforcingPermissions;
         } else {
             return canGoForward;
@@ -55,7 +55,7 @@ public class SoftPermissionSlide extends SimpleSlide {
         private boolean canGoForward = true;
         protected boolean enforcePermissions = false;
 
-        public Builder enforcePermissions(boolean enforcePermissions){
+        public Builder enforcePermissions(boolean enforcePermissions) {
             this.enforcePermissions = enforcePermissions;
             return this;
         }
@@ -76,7 +76,7 @@ public class SoftPermissionSlide extends SimpleSlide {
             return this;
         }
 
-        public SoftPermissionSlide build(){
+        public SoftPermissionSlide build() {
             if (backgroundRes == 0)
                 throw new IllegalArgumentException("You must set a background.");
 

@@ -31,7 +31,7 @@ import de.jeanpierrehotz.severalpictureswallpaper.R;
 /**
  *
  */
-public class ColorDialog implements SeekBar.OnSeekBarChangeListener, DialogInterface.OnCancelListener{
+public class ColorDialog implements SeekBar.OnSeekBarChangeListener, DialogInterface.OnCancelListener {
 
     private AlertDialog dialog;
 
@@ -113,12 +113,12 @@ public class ColorDialog implements SeekBar.OnSeekBarChangeListener, DialogInter
         updateSeekbars();
     }
 
-    private void adopt(){
+    private void adopt() {
         mColorSaved = mColor;
         dispatchColorEvent(true);
     }
 
-    private void discard(){
+    private void discard() {
         mColor = mColorSaved;
         dispatchColorEvent(true);
         updateSeekbars();
@@ -130,13 +130,13 @@ public class ColorDialog implements SeekBar.OnSeekBarChangeListener, DialogInter
         updateSeekbars();
     }
 
-    private void dispatchColorEvent(boolean finalvalue){
-        if(listener != null) {
+    private void dispatchColorEvent(boolean finalvalue) {
+        if (listener != null) {
             listener.onColorChanged(mColor, finalvalue);
         }
     }
 
-    private void updateSeekbars(){
+    private void updateSeekbars() {
         this.locked = true;
 
         rSeekBar.setProgress(Color.red(mColor));
@@ -148,7 +148,7 @@ public class ColorDialog implements SeekBar.OnSeekBarChangeListener, DialogInter
         this.locked = false;
     }
 
-    private void updateColor(){
+    private void updateColor() {
         colorLayout.setBackgroundColor(mColor);
     }
 
@@ -160,12 +160,12 @@ public class ColorDialog implements SeekBar.OnSeekBarChangeListener, DialogInter
         this.listener = listener;
     }
 
-    public void show(){
+    public void show() {
         mColorSaved = mColor;
         dialog.show();
     }
 
-    public void dismiss(){
+    public void dismiss() {
         dialog.dismiss();
         discard();
     }
@@ -177,7 +177,7 @@ public class ColorDialog implements SeekBar.OnSeekBarChangeListener, DialogInter
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        if(!locked) {
+        if (!locked) {
             mColor = Color.rgb(rSeekBar.getProgress(), gSeekBar.getProgress(), bSeekBar.getProgress());
             updateColor();
             dispatchColorEvent(false);
@@ -185,10 +185,12 @@ public class ColorDialog implements SeekBar.OnSeekBarChangeListener, DialogInter
     }
 
     @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {}
+    public void onStartTrackingTouch(SeekBar seekBar) {
+    }
 
     @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {}
+    public void onStopTrackingTouch(SeekBar seekBar) {
+    }
 
     public interface OnColorChangedListener {
         void onColorChanged(int color, boolean finalvalue);
