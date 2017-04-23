@@ -16,12 +16,19 @@
   -->
 
 <resources>
-    <color name="colorPrimary">#36465d</color>
-    <color name="colorPrimaryDark">#26364d</color>
-    <color name="colorAccent">#6441a4</color>
-    <color name="tumblr">#36465d</color>
-    <color name="dividercolor">#A0A0A0</color>
 
-    <color name="intro">#3F51B5</color>
-    <color name="intro_dark">#303F9F</color>
+    <declare-styleable name="ColorShowerView">
+        <attr name="cs_initialColor" format="color"/>
+        <attr name="cs_borderColor" format="color"/>
+        <attr name="cs_borderWidth" format="float"/>
+    </declare-styleable>
+
+    <declare-styleable name="ColorView">
+
+        <attr name="cv_initialcolor" format="color"/>
+        <attr name="cv_caption" format="string"/>
+        <attr name="cv_description" format="string"/>
+
+    </declare-styleable>
+
 </resources>

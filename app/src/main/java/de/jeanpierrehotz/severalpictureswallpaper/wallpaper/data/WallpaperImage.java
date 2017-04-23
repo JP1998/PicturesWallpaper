@@ -1,10 +1,11 @@
 /*
- *      Copyright 2016 Jean-Pierre Hotz
+ *     Copyright 2017 Jean-Pierre Hotz
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +16,7 @@
 
 package de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,13 +26,17 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 import com.blunderer.materialdesignlibrary.views.CardView;
+
+import java.util.Locale;
 
 /**
  *
  */
-public class WallpaperImage{
+public class WallpaperImage {
 
     private static final int SAMPLE_WIDTH = 450;
     private static final int SAMPLE_HEIGHT = 800;
@@ -44,23 +50,33 @@ public class WallpaperImage{
     private int x;
     private int y;
 
-    public WallpaperImage(String path){
+    public WallpaperImage(String path) {
         mPath = path;
     }
 
-    public void loadImage(){
-        if(mImage == null){
-            Bitmap immutableBitMap = BitmapFactory.decodeFile(mPath);
-            // make the loaded Bitmap to be mutable :)
-            mImage = immutableBitMap.copy(Bitmap.Config.ARGB_8888, true);
+    public void loadImage(Context ctx) {
+        if (mImage == null) {
+            DisplayMetrics display = new DisplayMetrics();
+            ((WindowManager) ctx.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getMetrics(display);
 
-            x = mImage.getWidth();
-            y = mImage.getHeight();
+            BitmapFactory.Options opt = new BitmapFactory.Options();
+            opt.inSampleSize = calculateInSampleSize(x, y, display.widthPixels, display.heightPixels);
+            opt.inJustDecodeBounds = false;
+
+            mImage = BitmapFactory.decodeFile(mPath, opt);
+
+            if (mImage != null) {
+                x = mImage.getWidth();
+                y = mImage.getHeight();
+            } else {
+                x = 0;
+                y = 0;
+            }
         }
     }
 
-    public void loadAsPreview(CardView toLoadTo){
-        if(mImage == null){
+    public void loadAsPreview(CardView toLoadTo) {
+        if (mImage == null) {
             BitmapFactory.Options opt = new BitmapFactory.Options();
             opt.inJustDecodeBounds = true;
             BitmapFactory.decodeFile(mPath, opt);
@@ -73,38 +89,44 @@ public class WallpaperImage{
         }
     }
 
-    public void releaseImage(){
-        if(mImage != null){
+    public void releaseImage() {
+        if (mImage != null) {
             mImage.recycle();
             mImage = null;
         }
     }
 
-    public String getResolution(){
-        if(mImage != null || (x != 0 && y != 0)){
-            return String.format("%1$d x %2$dpx", x, y);
-        }else{
+    public String getResolution() {
+        if (mImage != null || (x != 0 && y != 0)) {
+            return String.format(Locale.getDefault(), "%1$d x %2$dpx", x, y);
+        } else {
             return "0 x 0px";
         }
     }
 
-    public String getFileName(){
+    public String getFileName() {
         return mPath.substring(mPath.lastIndexOf("/") + 1, mPath.lastIndexOf("."));
     }
 
-    String getPath(){
-        return mPath;
+    String getPath() {
+        return this.mPath;
     }
 
-    public void drawImage(float x, float y, Canvas c, Paint p){
-        c.drawBitmap(mImage, new Rect(0, 0, mImage.getWidth(), mImage.getHeight()), new RectF(0, 0, x, y), p);
+    public boolean drawable() {
+        return this.mImage != null;
     }
 
-    class PreviewLoaderTask extends AsyncTask<Integer, Void, Bitmap>{
+    public void drawImage(float x, float y, Canvas c, Paint p) {
+        if (this.mImage != null) {
+            c.drawBitmap(mImage, new Rect(0, 0, mImage.getWidth(), mImage.getHeight()), new RectF(0, 0, x, y), p);
+        }
+    }
+
+    private class PreviewLoaderTask extends AsyncTask<Integer, Void, Bitmap> {
 
         private CardView cardViewReference;
 
-        public PreviewLoaderTask(CardView v){
+        public PreviewLoaderTask(CardView v) {
             cardViewReference = v;
         }
 
@@ -113,44 +135,46 @@ public class WallpaperImage{
          * 1 -> currY
          * 2 -> targetX
          * 3 -> targetY
+         *
          * @param integers asd
          * @return asd
          */
         @Override
-        protected Bitmap doInBackground(Integer... integers){
+        protected Bitmap doInBackground(Integer... integers) {
             BitmapFactory.Options opt = new BitmapFactory.Options();
             opt.inSampleSize = calculateInSampleSize(x, y, SAMPLE_WIDTH, SAMPLE_HEIGHT);
             opt.inJustDecodeBounds = false;
             return BitmapFactory.decodeFile(mPath, opt);
         }
 
-        private int calculateInSampleSize(int currWidth, int currHeight, int reqWidth, int reqHeight) {
-            int inSampleSize = 1;
-
-            if (currHeight > reqHeight || currWidth > reqWidth) {
-
-                final int halfHeight = currHeight / 2;
-                final int halfWidth = currWidth / 2;
-
-                // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-                // height and width larger than the requested height and width.
-                while ((halfHeight / inSampleSize) >= reqHeight
-                        && (halfWidth / inSampleSize) >= reqWidth) {
-                    inSampleSize *= 2;
-                }
-            }
-
-            return inSampleSize;
-        }
-
         @Override
-        protected void onPostExecute(Bitmap bitmap){
-            if(bitmap != null && cardViewReference != null){
+        protected void onPostExecute(Bitmap bitmap) {
+            if (bitmap != null && cardViewReference != null) {
                 mImage = bitmap;
                 cardViewReference.setImageDrawable(new BitmapDrawable(Resources.getSystem(), mImage));
                 cardViewReference = null;
             }
         }
     }
+
+    public int calculateInSampleSize(int currWidth, int currHeight, int reqWidth, int reqHeight) {
+        int inSampleSize = 1;
+
+        if (currHeight > reqHeight || currWidth > reqWidth) {
+
+            final int halfHeight = currHeight / 2;
+            final int halfWidth = currWidth / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
 
 }

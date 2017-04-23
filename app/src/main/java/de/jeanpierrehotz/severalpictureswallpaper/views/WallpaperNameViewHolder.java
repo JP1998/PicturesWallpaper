@@ -1,10 +1,11 @@
 /*
- *      Copyright 2016 Jean-Pierre Hotz
+ *     Copyright 2017 Jean-Pierre Hotz
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,7 +26,7 @@ import de.jeanpierrehotz.severalpictureswallpaper.R;
 /**
  *
  */
-public class WallpaperNameViewHolder extends RecyclerView.ViewHolder{
+public class WallpaperNameViewHolder extends RecyclerView.ViewHolder {
 
     private RelativeLayout rootView;
 
@@ -33,11 +34,11 @@ public class WallpaperNameViewHolder extends RecyclerView.ViewHolder{
     private TextView selectedTextView;
     private int position;
 
-    public int getNumber(){
+    public int getNumber() {
         return position;
     }
 
-    public WallpaperNameViewHolder(View itemView){
+    public WallpaperNameViewHolder(View itemView) {
         super(itemView);
 
         rootView = (RelativeLayout) itemView.findViewById(R.id.rootlayout);
@@ -46,15 +47,15 @@ public class WallpaperNameViewHolder extends RecyclerView.ViewHolder{
         selectedTextView = (TextView) itemView.findViewById(R.id.setting_selected_textview);
     }
 
-    public void setCaption(String capt){
+    public void setCaption(String capt) {
         captionTextView.setText(capt);
     }
 
-    public void setSelected(int sel, int num){
+    public void setSelected(int sel, int num) {
         position = num;
-        if(sel == num){
+        if (sel == num) {
             selectedTextView.setText(rootView.getContext().getString(R.string.selected_text));
-        }else{
+        } else {
             selectedTextView.setText("");
         }
     }

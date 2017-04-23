@@ -1,10 +1,11 @@
 /*
- *      Copyright 2016 Jean-Pierre Hotz
+ *     Copyright 2017 Jean-Pierre Hotz
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,11 +25,11 @@ import android.view.View;
 
 import de.jeanpierrehotz.severalpictureswallpaper.R;
 
-public class DividerView extends View{
+public class DividerView extends View {
 
     private Paint p;
 
-    public DividerView(Context context){
+    public DividerView(Context context) {
         super(context);
         this.p = new Paint();
         p.setColor(ContextCompat.getColor(getContext(), R.color.dividercolor));
@@ -36,7 +37,7 @@ public class DividerView extends View{
         this.postInvalidate();
     }
 
-    public DividerView(Context context, AttributeSet attrs){
+    public DividerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.p = new Paint();
         p.setColor(ContextCompat.getColor(getContext(), R.color.dividercolor));
@@ -44,7 +45,7 @@ public class DividerView extends View{
         this.postInvalidate();
     }
 
-    public DividerView(Context context, AttributeSet attrs, int defStyleAttr){
+    public DividerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.p = new Paint();
         p.setColor(ContextCompat.getColor(getContext(), R.color.dividercolor));
@@ -53,7 +54,7 @@ public class DividerView extends View{
     }
 
     @Override
-    protected void onDraw(Canvas canvas){
+    protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
         canvas.drawRect(0, 0, getWidth(), getHeight(), p);
