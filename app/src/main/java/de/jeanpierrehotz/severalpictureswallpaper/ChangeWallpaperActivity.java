@@ -18,7 +18,6 @@ package de.jeanpierrehotz.severalpictureswallpaper;
 
 import android.Manifest;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,6 +32,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
@@ -40,14 +40,14 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 
 import de.jeanpierrehotz.severalpictureswallpaper.utils.WallpaperPictureSelector;
 import de.jeanpierrehotz.severalpictureswallpaper.views.WallpaperImageAdapter;
 import de.jeanpierrehotz.severalpictureswallpaper.views.color.ColorView;
+import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperDataManager;
 import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImage;
-import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImageManager;
+import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperSettings;
 
 /**
  *
@@ -58,24 +58,24 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
     /// BottomSheet
     ///
 
+    private static final int CODE_TRIED_SELECTING_IMAGE = 0x12345;
     // Views & Objects
     private LinearLayout bottomSheet;
     private BottomSheetBehavior<LinearLayout> bottomSheetBehaviour;
-
     private TextView furtherSettings_Value_TextView;
     private SeekBar furtherSettings_Value_SeekBar;
-
-    private Switch furtherSettings_SwipeToSwitch_Switch;
-    private Switch furtherSettings_SwipeToSwitchWallpaper_Switch;
-
+    private Switch furtherSettings_DetectGestures_Switch;
+    private Switch furtherSettings_LockWallpaper_Switch;
     private ColorView furtherSettings_Fallbackcolor_ColorView;
-    private int fallbackcolor;
-
+    private WallpaperSettings settings;
     // Listener
     private SeekBar.OnSeekBarChangeListener furtherSettings_Value_SeekBar_OnChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
-        public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+        public void onProgressChanged(SeekBar seekBar, int i, boolean userInput) {
             furtherSettings_Value_TextView.setText(String.format(Locale.getDefault(), "%1$.1fs", ((double) furtherSettings_Value_SeekBar.getProgress())));
+            if (userInput) {
+                settings.setShowPictureTime(furtherSettings_Value_SeekBar.getProgress());
+            }
         }
 
         @Override
@@ -86,36 +86,46 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
         public void onStopTrackingTouch(SeekBar seekBar) {
         }
     };
-
-    private ColorView.OnColorChangedListener furtherSettings_Fallbackcolor_ColorView_OnColorChangedListener = new ColorView.OnColorChangedListener() {
+    private CompoundButton.OnCheckedChangeListener furtherSettings_DetectGestures_Switch_OnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
-        public void onColorChanged(int color, boolean finalvalue) {
-            fallbackcolor = color;
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            settings.setDetectGestures(isChecked);
+        }
+    };
+    private CompoundButton.OnCheckedChangeListener furtherSettings_LockWallpaper_Switch_OnCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            settings.setLockWallpaper(isChecked);
         }
     };
 
     ///
     /// Main content
     ///
-
+    private ColorView.OnColorChangedListener furtherSettings_Fallbackcolor_ColorView_OnColorChangedListener = new ColorView.OnColorChangedListener() {
+        @Override
+        public void onColorChanged(int color, boolean finalvalue) {
+            if (finalvalue) {
+                settings.setFallbackcolor(color);
+            }
+        }
+    };
     // Views & Objects
     private RecyclerView recyclerView;
     private WallpaperImageAdapter recyclerAdapter;
     private RecyclerView.LayoutManager recyclerManager;
-
     // Listener
     private WallpaperImageAdapter.OnItemNormalButtonClickListener recyclerNormalButtonClickListener = new WallpaperImageAdapter.OnItemNormalButtonClickListener() {
         @Override
         public void onClick(RecyclerView.ViewHolder vh, int pos) {
-            getSharedPreferences(getString(R.string.preferencecode_miscellanous) + wallpaperindex, MODE_PRIVATE)
-                    .edit()
-                    .putInt(getString(R.string.prefs_currentIndex), pos)
-                    .apply();
-
+            settings.setCurrentImage(pos);
         }
     };
-
     private ItemTouchHelper wallpaperImageHelper;
+
+    ///
+    /// Data
+    ///
     private ItemTouchHelper.Callback wallpaperImageHelperCallback = new ItemTouchHelper.Callback() {
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
@@ -127,7 +137,7 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
             int from = source.getAdapterPosition();
             int to = target.getAdapterPosition();
 
-            Collections.swap(images, from, to);
+            Collections.swap(settings.getImageList(), from, to);
             recyclerAdapter.notifyItemMoved(from, to);
 
             return true;
@@ -137,19 +147,13 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
         public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
             int pos = viewHolder.getAdapterPosition();
 
-            WallpaperImage removed = images.get(pos);
-            images.remove(pos);
+            WallpaperImage removed = settings.getImageList().get(pos);
+            settings.removeImage(pos);
             recyclerAdapter.notifyItemRemoved(pos);
             removed.releaseImage();
         }
     };
-
-    ///
-    /// Data
-    ///
-
     private int wallpaperindex;
-
     private WallpaperPictureSelector mWallpaperSelector;
     private WallpaperPictureSelector.Callback mWallpaperSelectorCallback = new WallpaperPictureSelector.Callback() {
         @Override
@@ -159,13 +163,11 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
         @Override
         public void onCropperResult(WallpaperPictureSelector.CropResult result, File srcFile, File outFile) {
             if (result == WallpaperPictureSelector.CropResult.success) {
-                images.add(new WallpaperImage(outFile.getAbsolutePath()));
-                recyclerAdapter.notifyItemInserted(images.size() - 1);
+                settings.addImage(new WallpaperImage(outFile.getAbsolutePath()));
+                recyclerAdapter.notifyItemInserted(settings.getImageList().size() - 1);
             }
         }
     };
-
-    private List<WallpaperImage> images;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,9 +186,11 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
         furtherSettings_Value_SeekBar = (SeekBar) findViewById(R.id.furthersettings_time_seekbar);
         furtherSettings_Value_SeekBar.setOnSeekBarChangeListener(furtherSettings_Value_SeekBar_OnChangeListener);
 
-        furtherSettings_SwipeToSwitch_Switch = (Switch) findViewById(R.id.furthersettings_swipetoswitch_switch);
+        furtherSettings_DetectGestures_Switch = (Switch) findViewById(R.id.furthersettings_swipetoswitch_switch);
+        furtherSettings_DetectGestures_Switch.setOnCheckedChangeListener(furtherSettings_DetectGestures_Switch_OnCheckedChangeListener);
 
-        furtherSettings_SwipeToSwitchWallpaper_Switch = (Switch) findViewById(R.id.furthersettings_swipetoswitchwallpaper_switch);
+        furtherSettings_LockWallpaper_Switch = (Switch) findViewById(R.id.furthersettings_swipetoswitchwallpaper_switch);
+        furtherSettings_LockWallpaper_Switch.setOnCheckedChangeListener(furtherSettings_LockWallpaper_Switch_OnCheckedChangeListener);
 
         furtherSettings_Fallbackcolor_ColorView = (ColorView) findViewById(R.id.furthersettings_fallbackcolor_colorview);
         furtherSettings_Fallbackcolor_ColorView.setOnColorChangedListener(furtherSettings_Fallbackcolor_ColorView_OnColorChangedListener);
@@ -194,10 +198,10 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
         mWallpaperSelector = new WallpaperPictureSelector(this);
         mWallpaperSelector.setCallback(mWallpaperSelectorCallback);
 
-        images = WallpaperImageManager.loadFromSharedPreferences(getSharedPreferences(getString(R.string.preferencecode_wallpaperimages) + wallpaperindex, MODE_PRIVATE));
+        settings = WallpaperDataManager.loadSetting(this, wallpaperindex);
 
         recyclerView = (RecyclerView) findViewById(R.id.images_recyclerview);
-        recyclerAdapter = new WallpaperImageAdapter(images);
+        recyclerAdapter = new WallpaperImageAdapter(settings);
         recyclerAdapter.setOnItemNormalButtonClickListener(recyclerNormalButtonClickListener);
         recyclerManager = new LinearLayoutManager(this);
 
@@ -207,17 +211,14 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
         wallpaperImageHelper = new ItemTouchHelper(wallpaperImageHelperCallback);
         wallpaperImageHelper.attachToRecyclerView(recyclerView);
 
-        SharedPreferences miscprefs = getSharedPreferences(getString(R.string.preferencecode_miscellanous) + wallpaperindex, MODE_PRIVATE);
-
         furtherSettings_Value_SeekBar.setProgress(0);
         furtherSettings_Value_SeekBar.setProgress(1);
 
-        furtherSettings_Value_SeekBar.setProgress(miscprefs.getInt(getString(R.string.prefs_showPictureTime), 60));
-        furtherSettings_SwipeToSwitch_Switch.setChecked(miscprefs.getBoolean(getString(R.string.prefs_detectGestures), true));
-        furtherSettings_SwipeToSwitchWallpaper_Switch.setChecked(miscprefs.getBoolean(getString(R.string.prefs_lockwallpaper), true));
+        furtherSettings_Value_SeekBar.setProgress(settings.getShowPictureTime());
+        furtherSettings_DetectGestures_Switch.setChecked(settings.isDetectGestures());
+        furtherSettings_LockWallpaper_Switch.setChecked(settings.isLockWallpaper());
 
-        fallbackcolor = miscprefs.getInt(getString(R.string.prefs_fallbackcolor), 0xFF000000);
-        furtherSettings_Fallbackcolor_ColorView.setColor(fallbackcolor);
+        furtherSettings_Fallbackcolor_ColorView.setColor(settings.getFallbackcolor());
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -227,8 +228,6 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
             }
         });
     }
-
-    private static final int CODE_TRIED_SELECTING_IMAGE = 0x12345;
 
     private void selectImage() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
@@ -263,10 +262,7 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.menu_changewallpaper_selectwallpaper) {
-            getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE)
-                    .edit()
-                    .putInt(getString(R.string.prefs_wallpaperindex), wallpaperindex)
-                    .apply();
+            WallpaperDataManager.saveSelectedSettingsIndex(this, wallpaperindex);
             return true;
         }
 
@@ -295,15 +291,7 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
-        WallpaperImageManager.saveToSharedPreferences(images, getSharedPreferences(getString(R.string.preferencecode_wallpaperimages) + wallpaperindex, MODE_PRIVATE));
-
-        getSharedPreferences(getString(R.string.preferencecode_miscellanous) + wallpaperindex, MODE_PRIVATE)
-                .edit()
-                .putInt(getString(R.string.prefs_showPictureTime), furtherSettings_Value_SeekBar.getProgress())
-                .putBoolean(getString(R.string.prefs_detectGestures), furtherSettings_SwipeToSwitch_Switch.isChecked())
-                .putBoolean(getString(R.string.prefs_lockwallpaper), furtherSettings_SwipeToSwitchWallpaper_Switch.isChecked())
-                .putInt(getString(R.string.prefs_fallbackcolor), fallbackcolor)
-                .apply();
+        WallpaperDataManager.saveSetting(this, settings, wallpaperindex);
     }
 
 }
