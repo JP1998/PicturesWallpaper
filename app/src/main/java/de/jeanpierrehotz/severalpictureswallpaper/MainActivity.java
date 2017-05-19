@@ -217,6 +217,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void modifySetting(int i) {
+        WallpaperDataManager.saveAllSettings(this, this.settings);
+
         Intent intent = new Intent(this, ChangeWallpaperActivity.class);
         intent.putExtra(getString(R.string.prefs_wallpaperindex), i);
         startActivity(intent);

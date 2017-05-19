@@ -103,11 +103,27 @@ public class WallpaperSettings {
     }
 
     public int getCurrentImage() {
+        refactorImageIndex();
         return currentImage;
     }
 
     public void setCurrentImage(int currentImage) {
         this.currentImage = currentImage;
+        refactorImageIndex();
+    }
+
+    private void refactorImageIndex() {
+        if (this.images.size() != 0) {
+            if (this.currentImage >= this.images.size()) {
+                this.currentImage %= this.images.size();
+            } else if (this.currentImage < 0) {
+                while (this.currentImage < 0) {
+                    this.currentImage += this.images.size();
+                }
+            }
+        } else {
+            this.currentImage = 0;
+        }
     }
 
     public void addImage(WallpaperImage img) {

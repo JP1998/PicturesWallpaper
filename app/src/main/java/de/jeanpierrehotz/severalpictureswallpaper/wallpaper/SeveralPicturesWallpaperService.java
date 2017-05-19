@@ -48,10 +48,10 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
 
     private static class FadeEnsemble {
 
-        private int fallbackColor;
-
         private WallpaperImage from;
+        private int fromfallbackcolor;
         private WallpaperImage to;
+        private int tofallbackcolor;
 
         private boolean locked;
 
@@ -81,14 +81,22 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
             }
         }
 
+        public void setSourceFallbackColor(int col) {
+            if (!locked) {
+                fromfallbackcolor = col;
+            }
+        }
+
         public void setDestination(WallpaperImage dest) {
             if (!locked) {
                 to = dest;
             }
         }
 
-        public void setFallbackColor(int fallbackColor) {
-            this.fallbackColor = fallbackColor;
+        public void setDestinationFallbackColor(int col) {
+            if (!locked) {
+                tofallbackcolor = col;
+            }
         }
 
         public void draw(int alpha, float x, float y, Canvas c, Paint p) {
@@ -96,7 +104,7 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
                 p.setAlpha(alpha);
                 from.drawImage(x, y, c, p);
             } else {
-                p.setColor(applyAlpha(fallbackColor, alpha));
+                p.setColor(applyAlpha(fromfallbackcolor, alpha));
                 p.setStyle(Paint.Style.FILL);
                 c.drawRect(0, 0, x, y, p);
             }
@@ -105,7 +113,7 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
                 p.setAlpha(255 - alpha);
                 to.drawImage(x, y, c, p);
             } else {
-                p.setColor(applyAlpha(fallbackColor, 255 - alpha));
+                p.setColor(applyAlpha(tofallbackcolor, 255 - alpha));
                 p.setStyle(Paint.Style.FILL);
                 c.drawRect(0, 0, x, y, p);
             }
@@ -174,9 +182,7 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
             @Override
             public void onDoubleUpSwiped() {
                 if (!fading && !settings.isLockWallpaper()) {
-                    skipToWallpaper(
-                            (wallpaperindex + 1) % WallpaperDataManager.loadWallpaperSettingsAmount(SeveralPicturesWallpaperService.this)
-                    );
+                    skipToWallpaper(WallpaperDataManager.loadNextUnlockedWallpaperIndex(SeveralPicturesWallpaperService.this, wallpaperindex));
                 }
             }
         };
@@ -184,11 +190,7 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
             @Override
             public void onDoubleDownSwiped() {
                 if (!fading && !settings.isLockWallpaper()) {
-                    skipToWallpaper(
-                            (wallpaperindex != 0) ?
-                                    wallpaperindex - 1 :
-                                    WallpaperDataManager.loadWallpaperSettingsAmount(SeveralPicturesWallpaperService.this)
-                    );
+                    skipToWallpaper(WallpaperDataManager.loadPrevUnlockedWallpaperIndex(SeveralPicturesWallpaperService.this, wallpaperindex));
                 }
             }
         };
@@ -255,7 +257,6 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
 
             if (settings.getImageList().size() > 0) {
                 currentImage = settings.getCurrentImage();
-                currentImage = getPreviousImageIndex();
 
                 fadeDirection = FadeDirection.forward;
 
@@ -295,12 +296,11 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
         }
 
         private void skipToWallpaper(int newWallpaper) {
-            boolean valid = true;
-
             if (settings.getImageList().size() > 0) {
                 fadingEnsemble.setSource(settings.getImageList().get(currentImage));
             } else {
-                valid = false;
+                fadingEnsemble.setSource(null);
+                fadingEnsemble.setSourceFallbackColor(settings.getFallbackcolor());
             }
             fadingEnsemble.lock();
 
@@ -319,18 +319,12 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
             if (settings.getImageList().size() > 0) {
                 fadingEnsemble.setDestination(settings.getImageList().get(nextImage));
             } else {
-                valid = false;
-
                 fadingEnsemble.setDestination(null);
-                fadingEnsemble.setSource(null);
+                fadingEnsemble.setDestinationFallbackColor(settings.getFallbackcolor());
             }
 
-            if (valid) {
-                fading = true;
-                alpha = 255;
-            } else {
-                fading = false;
-            }
+            fading = true;
+            alpha = 255;
 
             handler.removeCallbacks(drawFading);
             handler.removeCallbacks(drawSolid);
@@ -389,7 +383,9 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
                 fading = false;
                 fadeDirection = FadeDirection.forward;
 
-                refreshImages();
+                if (settings.getImageList().size() > 0) {
+                    refreshImages();
+                }
             }
         }
 

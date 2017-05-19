@@ -184,6 +184,72 @@ public class WallpaperDataManager {
                 .apply();
     }
 
+    /**
+     * This method looks up the next index of a unlocked wallpaper. If there is no wallpaper unlocked
+     * (except the wallpaper whose index is given) this method will return the given index regardless
+     * of whether or not it is unlocked.
+     *
+     * @param ctx   the Context used for loading the values from preferences
+     * @param index the index to search from
+     * @return the índex of the next unlocked wallpaper
+     */
+    public static int loadNextUnlockedWallpaperIndex(Context ctx, int index) {
+        int length = loadWallpaperSettingsAmount(ctx);
+
+        if (index < 0 || index >= length) {
+            throw new IndexOutOfBoundsException("Index: " + index + "; Length: " + length);
+        }
+
+        for (int i = index + 1; i < length; i++) {
+            if (!ctx.getSharedPreferences(WALLPAPERSETTINGS_PREFERENCES_CODE, Context.MODE_PRIVATE)
+                    .getBoolean(WALLPAPERSETTINGS_LOCKWALLPAPER_AT + i, WallpaperSettings.DEFAULT_LOCKWALLPAPER)) {
+                return i;
+            }
+        }
+
+        for (int i = 0; i < index; i++) {
+            if (!ctx.getSharedPreferences(WALLPAPERSETTINGS_PREFERENCES_CODE, Context.MODE_PRIVATE)
+                    .getBoolean(WALLPAPERSETTINGS_LOCKWALLPAPER_AT + i, WallpaperSettings.DEFAULT_LOCKWALLPAPER)) {
+                return i;
+            }
+        }
+
+        return index;
+    }
+
+    /**
+     * This method looks up the previous index of a unlocked wallpaper. If there is no wallpaper unlocked
+     * (except the wallpaper whose index is given) this method will return the given index regardless
+     * of whether or not it is unlocked.
+     *
+     * @param ctx   the Context used for loading the values from preferences
+     * @param index the index to search from
+     * @return the índex of the next unlocked wallpaper
+     */
+    public static int loadPrevUnlockedWallpaperIndex(Context ctx, int index) {
+        int length = loadWallpaperSettingsAmount(ctx);
+
+        if (index < 0 || index >= length) {
+            throw new IndexOutOfBoundsException("Index: " + index + "; Length: " + length);
+        }
+
+        for (int i = index - 1; i >= 0; i--) {
+            if (!ctx.getSharedPreferences(WALLPAPERSETTINGS_PREFERENCES_CODE, Context.MODE_PRIVATE)
+                    .getBoolean(WALLPAPERSETTINGS_LOCKWALLPAPER_AT + i, WallpaperSettings.DEFAULT_LOCKWALLPAPER)) {
+                return i;
+            }
+        }
+
+        for (int i = length - 1; i > index; i--) {
+            if (!ctx.getSharedPreferences(WALLPAPERSETTINGS_PREFERENCES_CODE, Context.MODE_PRIVATE)
+                    .getBoolean(WALLPAPERSETTINGS_LOCKWALLPAPER_AT + i, WallpaperSettings.DEFAULT_LOCKWALLPAPER)) {
+                return i;
+            }
+        }
+
+        return index;
+    }
+
     public static int loadWallpaperSettingsAmount(Context ctx) {
         return ctx.getSharedPreferences(WALLPAPERSETTINGS_PREFERENCES_CODE, Context.MODE_PRIVATE)
                 .getInt(WALLPAPERSETTINGS_NUMBEROFSETTINGS, 0);
