@@ -23,23 +23,21 @@ import android.view.ViewGroup;
 
 import com.blunderer.materialdesignlibrary.views.CardView;
 
-import java.util.List;
-
 import de.jeanpierrehotz.severalpictureswallpaper.R;
-import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImage;
+import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperSettings;
 
 /**
  *
  */
 public class WallpaperImageAdapter extends RecyclerView.Adapter<WallpaperImageViewHolder> {
 
-    private List<WallpaperImage> dataSet;
+    private WallpaperSettings settings;
 
     private OnItemNormalButtonClickListener mNormalButtonClickListener;
     private OnItemHighlightButtonClickListener mHighlightButtonclickListener;
 
-    public WallpaperImageAdapter(List<WallpaperImage> data) {
-        dataSet = data;
+    public WallpaperImageAdapter(WallpaperSettings settings) {
+        this.settings = settings;
     }
 
     public void setOnItemNormalButtonClickListener(OnItemNormalButtonClickListener list) {
@@ -92,19 +90,19 @@ public class WallpaperImageAdapter extends RecyclerView.Adapter<WallpaperImageVi
     public void onViewRecycled(WallpaperImageViewHolder holder) {
         super.onViewRecycled(holder);
 
-        if (holder.getAdapterPosition() < dataSet.size() && holder.getAdapterPosition() >= 0) {
-            dataSet.get(holder.getAdapterPosition()).releaseImage();
+        if (holder.getAdapterPosition() < settings.getImageList().size() && holder.getAdapterPosition() >= 0) {
+            settings.getImageList().get(holder.getAdapterPosition()).releaseImage();
         }
     }
 
     @Override
     public void onBindViewHolder(WallpaperImageViewHolder holder, int position) {
-        holder.onBind(dataSet.get(position));
+        holder.onBind(settings.getImageList().get(position));
     }
 
     @Override
     public int getItemCount() {
-        return dataSet.size();
+        return settings.getImageList().size();
     }
 
     public interface OnItemNormalButtonClickListener {

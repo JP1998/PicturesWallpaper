@@ -41,9 +41,6 @@ public class WallpaperImage {
     private static final int SAMPLE_WIDTH = 450;
     private static final int SAMPLE_HEIGHT = 800;
 
-    private static final String PATH_AT = "This is the image at index ";
-    private static final String TOTAL_NUMBER = "This is the length of the pictures.";
-
     private final String mPath;
     private Bitmap mImage;
 
@@ -122,6 +119,25 @@ public class WallpaperImage {
         }
     }
 
+    public int calculateInSampleSize(int currWidth, int currHeight, int reqWidth, int reqHeight) {
+        int inSampleSize = 1;
+
+        if (currHeight > reqHeight || currWidth > reqWidth) {
+
+            final int halfHeight = currHeight / 2;
+            final int halfWidth = currWidth / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) >= reqHeight
+                    && (halfWidth / inSampleSize) >= reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
     private class PreviewLoaderTask extends AsyncTask<Integer, Void, Bitmap> {
 
         private CardView cardViewReference;
@@ -155,25 +171,6 @@ public class WallpaperImage {
                 cardViewReference = null;
             }
         }
-    }
-
-    public int calculateInSampleSize(int currWidth, int currHeight, int reqWidth, int reqHeight) {
-        int inSampleSize = 1;
-
-        if (currHeight > reqHeight || currWidth > reqWidth) {
-
-            final int halfHeight = currHeight / 2;
-            final int halfWidth = currWidth / 2;
-
-            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
-            // height and width larger than the requested height and width.
-            while ((halfHeight / inSampleSize) >= reqHeight
-                    && (halfWidth / inSampleSize) >= reqWidth) {
-                inSampleSize *= 2;
-            }
-        }
-
-        return inSampleSize;
     }
 
 

@@ -22,9 +22,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import de.jeanpierrehotz.severalpictureswallpaper.R;
+import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperSettings;
 
 /**
  *
@@ -33,22 +34,22 @@ public class WallpaperNameAdapter extends RecyclerView.Adapter<WallpaperNameView
 
     private Context c;
 
-    private ArrayList<String> captions;
+    private List<WallpaperSettings> settings;
     private int selected;
+    private OnItemClickListener clickListener;
 
-    public WallpaperNameAdapter(Context ctx, ArrayList<String> captions, int selected) {
+    public WallpaperNameAdapter(Context ctx, List<WallpaperSettings> settings, int selected) {
         this.c = ctx;
 
-        this.captions = captions;
+        this.settings = settings;
         this.selected = selected;
     }
 
     public void notifySelectedChanged(int sel) {
+        this.notifyItemChanged(this.selected);
         this.selected = sel;
-        this.notifyDataSetChanged();
+        this.notifyItemChanged(this.selected);
     }
-
-    private OnItemClickListener clickListener;
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         clickListener = listener;
@@ -65,7 +66,7 @@ public class WallpaperNameAdapter extends RecyclerView.Adapter<WallpaperNameView
             @Override
             public void onClick(View view) {
                 if (clickListener != null) {
-                    clickListener.onItemClicked(vh, vh.getNumber());
+                    clickListener.onItemClicked(vh, vh.getAdapterPosition());
                 }
             }
         });
@@ -75,13 +76,13 @@ public class WallpaperNameAdapter extends RecyclerView.Adapter<WallpaperNameView
 
     @Override
     public void onBindViewHolder(WallpaperNameViewHolder holder, int position) {
-        holder.setCaption(captions.get(position));
+        holder.setCaption(settings.get(position).getCaption());
         holder.setSelected(selected, position);
     }
 
     @Override
     public int getItemCount() {
-        return captions.size();
+        return settings.size();
     }
 
     public interface OnItemClickListener {

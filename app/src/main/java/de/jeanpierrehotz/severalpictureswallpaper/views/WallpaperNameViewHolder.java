@@ -32,11 +32,6 @@ public class WallpaperNameViewHolder extends RecyclerView.ViewHolder {
 
     private TextView captionTextView;
     private TextView selectedTextView;
-    private int position;
-
-    public int getNumber() {
-        return position;
-    }
 
     public WallpaperNameViewHolder(View itemView) {
         super(itemView);
@@ -52,7 +47,6 @@ public class WallpaperNameViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void setSelected(int sel, int num) {
-        position = num;
         if (sel == num) {
             selectedTextView.setText(rootView.getContext().getString(R.string.selected_text));
         } else {

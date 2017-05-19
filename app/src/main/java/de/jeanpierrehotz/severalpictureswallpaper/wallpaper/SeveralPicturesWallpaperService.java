@@ -16,7 +16,6 @@
 
 package de.jeanpierrehotz.severalpictureswallpaper.wallpaper;
 
-import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -25,12 +24,10 @@ import android.service.wallpaper.WallpaperService;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
-import java.util.List;
-
-import de.jeanpierrehotz.severalpictureswallpaper.R;
 import de.jeanpierrehotz.severalpictureswallpaper.utils.DoubleSwipeGestureDetector;
+import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperDataManager;
 import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImage;
-import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImageManager;
+import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperSettings;
 
 /**
  *
@@ -42,6 +39,85 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
     @Override
     public Engine onCreateEngine() {
         return new SeveralPicturesWallpaper();
+    }
+
+    private enum FadeDirection {
+        forward,
+        backward
+    }
+
+    private static class FadeEnsemble {
+
+        private WallpaperImage from;
+        private int fromfallbackcolor;
+        private WallpaperImage to;
+        private int tofallbackcolor;
+
+        private boolean locked;
+
+        public FadeEnsemble() {
+        }
+
+        private static int applyAlpha(int color, int alpha) {
+            return Color.argb(
+                    alpha,
+                    Color.red(color),
+                    Color.green(color),
+                    Color.blue(color)
+            );
+        }
+
+        public void lock() {
+            locked = true;
+        }
+
+        public void unlock() {
+            locked = false;
+        }
+
+        public void setSource(WallpaperImage src) {
+            if (!locked) {
+                from = src;
+            }
+        }
+
+        public void setSourceFallbackColor(int col) {
+            if (!locked) {
+                fromfallbackcolor = col;
+            }
+        }
+
+        public void setDestination(WallpaperImage dest) {
+            if (!locked) {
+                to = dest;
+            }
+        }
+
+        public void setDestinationFallbackColor(int col) {
+            if (!locked) {
+                tofallbackcolor = col;
+            }
+        }
+
+        public void draw(int alpha, float x, float y, Canvas c, Paint p) {
+            if (from != null && from.drawable()) {
+                p.setAlpha(alpha);
+                from.drawImage(x, y, c, p);
+            } else {
+                p.setColor(applyAlpha(fromfallbackcolor, alpha));
+                p.setStyle(Paint.Style.FILL);
+                c.drawRect(0, 0, x, y, p);
+            }
+
+            if (to != null && to.drawable()) {
+                p.setAlpha(255 - alpha);
+                to.drawImage(x, y, c, p);
+            } else {
+                p.setColor(applyAlpha(tofallbackcolor, 255 - alpha));
+                p.setStyle(Paint.Style.FILL);
+                c.drawRect(0, 0, x, y, p);
+            }
+        }
     }
 
     private class SeveralPicturesWallpaper extends Engine {
@@ -59,10 +135,7 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
 
         private int wallpaperindex;
 
-        private boolean detectGestures;
-        private boolean lockWallpaper;
-        private int showPictureTime;
-        private int fallbackcolor;
+        private WallpaperSettings settings;
 
         private int alpha;
         private boolean fading;
@@ -73,17 +146,16 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
 
         private FadeEnsemble fadingEnsemble;
         private FadeDirection fadeDirection;
-        private List<WallpaperImage> images;
 
         private DoubleSwipeGestureDetector mDoubleLeftSwipeGestureDetector;
         private DoubleSwipeGestureDetector.OnDoubleLeftSwipeListener mOnDoubleLeftSwipeListener = new DoubleSwipeGestureDetector.OnDoubleLeftSwipeListener() {
             @Override
             public void onDoubleLeftSwiped() {
-                if (!fading && detectGestures && images.size() > 0) {
+                if (!fading && settings.isDetectGestures() && settings.getImageList().size() > 0) {
                     fadeDirection = FadeDirection.forward;
 
-                    fadingEnsemble.setSource(images.get(currentImage));
-                    fadingEnsemble.setDestination(images.get(nextImage));
+                    fadingEnsemble.setSource(settings.getImageList().get(currentImage));
+                    fadingEnsemble.setDestination(settings.getImageList().get(nextImage));
 
                     handler.removeCallbacks(drawFading);
                     handler.removeCallbacks(drawSolid);
@@ -94,11 +166,11 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
         private DoubleSwipeGestureDetector.OnDoubleRightSwipeListener mOnDoubleRightSwipeListener = new DoubleSwipeGestureDetector.OnDoubleRightSwipeListener() {
             @Override
             public void onDoubleRightSwiped() {
-                if (!fading && detectGestures && images.size() > 0) {
+                if (!fading && settings.isDetectGestures() && settings.getImageList().size() > 0) {
                     fadeDirection = FadeDirection.backward;
 
-                    fadingEnsemble.setSource(images.get(currentImage));
-                    fadingEnsemble.setDestination(images.get(previousImage));
+                    fadingEnsemble.setSource(settings.getImageList().get(currentImage));
+                    fadingEnsemble.setDestination(settings.getImageList().get(previousImage));
 
                     handler.removeCallbacks(drawFading);
                     handler.removeCallbacks(drawSolid);
@@ -109,25 +181,16 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
         private DoubleSwipeGestureDetector.OnDoubleUpSwipeListener mOnDouleUpSwipeListener = new DoubleSwipeGestureDetector.OnDoubleUpSwipeListener() {
             @Override
             public void onDoubleUpSwiped() {
-                if (!fading && !lockWallpaper) {
-                    skipToWallpaper(
-                            (wallpaperindex + 1) %
-                                    getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE)
-                                            .getInt(getString(R.string.prefs_wallpapercount), 0)
-                    );
+                if (!fading && !settings.isLockWallpaper()) {
+                    skipToWallpaper(WallpaperDataManager.loadNextUnlockedWallpaperIndex(SeveralPicturesWallpaperService.this, wallpaperindex));
                 }
             }
         };
         private DoubleSwipeGestureDetector.OnDoubleDownSwipeListener mOnDouleDownSwipeListener = new DoubleSwipeGestureDetector.OnDoubleDownSwipeListener() {
             @Override
             public void onDoubleDownSwiped() {
-                if (!fading && !lockWallpaper) {
-                    skipToWallpaper(
-                            (wallpaperindex != 0) ?
-                                    wallpaperindex - 1 :
-                                    getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE)
-                                            .getInt(getString(R.string.prefs_wallpapercount), 0) - 1
-                    );
+                if (!fading && !settings.isLockWallpaper()) {
+                    skipToWallpaper(WallpaperDataManager.loadPrevUnlockedWallpaperIndex(SeveralPicturesWallpaperService.this, wallpaperindex));
                 }
             }
         };
@@ -149,7 +212,7 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
             drawFading = new Runnable() {
                 @Override
                 public void run() {
-                    if (images.size() > 0 && !fading) {
+                    if (settings.getImageList().size() > 0 && !fading) {
                         fading = true;
                         alpha = 255;
                     }
@@ -178,7 +241,7 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
                     handler.removeCallbacks(drawSolid);
 
                     if (visible) {
-                        handler.postDelayed(drawFading, showPictureTime * TIME_STRETCH);
+                        handler.postDelayed(drawFading, settings.getShowPictureTime() * TIME_STRETCH);
                     }
                 }
             };
@@ -189,22 +252,11 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
                 fadingEnsemble = new FadeEnsemble();
             }
 
-            wallpaperindex = getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE).getInt(getString(R.string.prefs_wallpaperindex), 0);
+            wallpaperindex = WallpaperDataManager.loadSelectedSettingsIndex(SeveralPicturesWallpaperService.this, 0);
+            settings = WallpaperDataManager.loadSetting(SeveralPicturesWallpaperService.this, wallpaperindex);
 
-            images = WallpaperImageManager.loadFromSharedPreferences(getSharedPreferences(getString(R.string.preferencecode_wallpaperimages) + wallpaperindex, MODE_PRIVATE));
-
-            SharedPreferences prefs = getSharedPreferences(getString(R.string.preferencecode_miscellanous) + wallpaperindex, MODE_PRIVATE);
-
-            detectGestures = prefs.getBoolean(getString(R.string.prefs_detectGestures), true);
-            lockWallpaper = prefs.getBoolean(getString(R.string.prefs_lockwallpaper), true);
-            showPictureTime = prefs.getInt(getString(R.string.prefs_showPictureTime), 10);
-            fallbackcolor = prefs.getInt(getString(R.string.prefs_fallbackcolor), Color.BLACK);
-
-            fadingEnsemble.setFallbackColor(fallbackcolor);
-
-            if (images.size() > 0) {
-                currentImage = prefs.getInt(getString(R.string.prefs_currentIndex), 0) % images.size();
-                currentImage = getPreviousImageIndex();
+            if (settings.getImageList().size() > 0) {
+                currentImage = settings.getCurrentImage();
 
                 fadeDirection = FadeDirection.forward;
 
@@ -223,62 +275,56 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
             previousImage = getPreviousImageIndex();
             nextImage = getNextImageIndex();
 
-            for (int i = 0; i < images.size(); i++) {
+            for (int i = 0; i < settings.getImageList().size(); i++) {
                 if (i == previousImage || i == currentImage || i == nextImage) {
-                    images.get(i).loadImage(SeveralPicturesWallpaperService.this);
+                    settings.getImageList().get(i).loadImage(SeveralPicturesWallpaperService.this);
                 } else {
-                    images.get(i).releaseImage();
+                    settings.getImageList().get(i).releaseImage();
                 }
             }
 
-            fadingEnsemble.setSource(images.get(currentImage));
-            fadingEnsemble.setDestination(images.get(nextImage));
+            fadingEnsemble.setSource(settings.getImageList().get(currentImage));
+            fadingEnsemble.setDestination(settings.getImageList().get(nextImage));
         }
 
         private int getNextImageIndex() {
-            return (currentImage == images.size() - 1) ? 0 : currentImage + 1;
+            return (currentImage == settings.getImageList().size() - 1) ? 0 : currentImage + 1;
         }
 
         private int getPreviousImageIndex() {
-            return (currentImage == 0) ? images.size() - 1 : currentImage - 1;
+            return (currentImage == 0) ? settings.getImageList().size() - 1 : currentImage - 1;
         }
 
         private void skipToWallpaper(int newWallpaper) {
-            wallpaperindex = newWallpaper;
-
-            boolean valid = true;
-
-            if (images.size() > 0) {
-                fadingEnsemble.setSource(images.get(currentImage));
+            if (settings.getImageList().size() > 0) {
+                fadingEnsemble.setSource(settings.getImageList().get(currentImage));
             } else {
-                valid = false;
+                fadingEnsemble.setSource(null);
+                fadingEnsemble.setSourceFallbackColor(settings.getFallbackcolor());
             }
             fadingEnsemble.lock();
 
+            wallpaperindex = newWallpaper;
             saveWallpaperIndex();
             loadPreferences();
 
-            if (images.size() > 0) {
+            if (settings.getImageList().size() > 0) {
                 currentImage = getPreviousImageIndex();
+                settings.setCurrentImage(currentImage);
+                saveImageIndex();
                 refreshImages();
             }
 
             fadingEnsemble.unlock();
-            if (images.size() > 0) {
-                fadingEnsemble.setDestination(images.get(nextImage));
+            if (settings.getImageList().size() > 0) {
+                fadingEnsemble.setDestination(settings.getImageList().get(nextImage));
             } else {
-                valid = false;
-
                 fadingEnsemble.setDestination(null);
-                fadingEnsemble.setSource(null);
+                fadingEnsemble.setDestinationFallbackColor(settings.getFallbackcolor());
             }
 
-            if (valid) {
-                fading = true;
-                alpha = 255;
-            } else {
-                fading = false;
-            }
+            fading = true;
+            alpha = 255;
 
             handler.removeCallbacks(drawFading);
             handler.removeCallbacks(drawSolid);
@@ -296,10 +342,10 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
                 if (c != null) {
                     if (!fadingDrawAttempt) {
                         p.setAlpha(255);
-                        if (images.size() > 0 && images.get(currentImage).drawable()) {
-                            images.get(currentImage).drawImage(x, y, c, p);
+                        if (settings.getImageList().size() > 0 && settings.getImageList().get(currentImage).drawable()) {
+                            settings.getImageList().get(currentImage).drawImage(x, y, c, p);
                         } else {
-                            p.setColor(fallbackcolor);
+                            p.setColor(settings.getFallbackcolor());
                             p.setStyle(Paint.Style.FILL);
                             c.drawRect(0, 0, x, y, p);
                         }
@@ -331,11 +377,15 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
                 } else {
                     currentImage = getPreviousImageIndex();
                 }
+                settings.setCurrentImage(currentImage);
+                saveImageIndex();
 
                 fading = false;
                 fadeDirection = FadeDirection.forward;
 
-                refreshImages();
+                if (settings.getImageList().size() > 0) {
+                    refreshImages();
+                }
             }
         }
 
@@ -350,23 +400,16 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
         public void onDestroy() {
             super.onDestroy();
 
-            saveImageIndex();
             handler.removeCallbacks(drawFading);
             handler.removeCallbacks(drawSolid);
         }
 
         public void saveWallpaperIndex() {
-            getSharedPreferences(getString(R.string.preferencecode_wallpapersinfo), MODE_PRIVATE)
-                    .edit()
-                    .putInt(getString(R.string.prefs_wallpaperindex), wallpaperindex)
-                    .apply();
+            WallpaperDataManager.saveSelectedSettingsIndex(SeveralPicturesWallpaperService.this, wallpaperindex);
         }
 
         private void saveImageIndex() {
-            getSharedPreferences(getString(R.string.preferencecode_miscellanous) + wallpaperindex, MODE_PRIVATE)
-                    .edit()
-                    .putInt(getString(R.string.prefs_currentIndex), currentImage)
-                    .apply();
+            WallpaperDataManager.saveSetting(SeveralPicturesWallpaperService.this, settings, wallpaperindex);
         }
 
         @Override
@@ -375,7 +418,6 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
                 loadPreferences();
                 handler.post(drawFading);
             } else {
-                saveImageIndex();
                 handler.removeCallbacks(drawFading);
                 handler.removeCallbacks(drawSolid);
             }
@@ -399,80 +441,8 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
 
             visible = false;
 
-            saveImageIndex();
             handler.removeCallbacks(drawFading);
             handler.removeCallbacks(drawSolid);
-        }
-    }
-
-    enum FadeDirection {
-        forward,
-        backward
-    }
-
-    private static class FadeEnsemble {
-
-        private int fallbackColor;
-
-        private WallpaperImage from;
-        private WallpaperImage to;
-
-        private boolean locked;
-
-        public FadeEnsemble() {
-        }
-
-        public void lock() {
-            locked = true;
-        }
-
-        public void unlock() {
-            locked = false;
-        }
-
-        public void setSource(WallpaperImage src) {
-            if (!locked) {
-                from = src;
-            }
-        }
-
-        public void setDestination(WallpaperImage dest) {
-            if (!locked) {
-                to = dest;
-            }
-        }
-
-        public void setFallbackColor(int fallbackColor) {
-            this.fallbackColor = fallbackColor;
-        }
-
-        public void draw(int alpha, float x, float y, Canvas c, Paint p) {
-            if (from != null && from.drawable()) {
-                p.setAlpha(alpha);
-                from.drawImage(x, y, c, p);
-            } else {
-                p.setColor(applyAlpha(fallbackColor, alpha));
-                p.setStyle(Paint.Style.FILL);
-                c.drawRect(0, 0, x, y, p);
-            }
-
-            if (to != null && to.drawable()) {
-                p.setAlpha(255 - alpha);
-                to.drawImage(x, y, c, p);
-            } else {
-                p.setColor(applyAlpha(fallbackColor, 255 - alpha));
-                p.setStyle(Paint.Style.FILL);
-                c.drawRect(0, 0, x, y, p);
-            }
-        }
-
-        private static int applyAlpha(int color, int alpha) {
-            return Color.argb(
-                    alpha,
-                    Color.red(color),
-                    Color.green(color),
-                    Color.blue(color)
-            );
         }
     }
 }
