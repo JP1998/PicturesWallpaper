@@ -98,31 +98,33 @@ public class ColorView extends LinearLayout implements View.OnClickListener, Col
         this.listener = listener;
     }
 
-    public void setColor(int color) {
-        colorShower.setColor(color);
-        colorDialog.setColor(color);
-
-        invalidate();
-    }
-
     public int getColor() {
         return colorShower.getColor();
     }
 
-    public void setCaption(String capt) {
-        captionTextView.setText(capt);
+    public void setColor(int color) {
+        colorShower.setColor(color);
+        if (!isInEditMode()) {
+            colorDialog.setColor(color);
+        }
+
+        invalidate();
     }
 
     public String getCaption() {
         return captionTextView.getText().toString();
     }
 
-    public void setDescription(String desc) {
-        descriptionTextView.setText(desc);
+    public void setCaption(String capt) {
+        captionTextView.setText(capt);
     }
 
     public String getDescription() {
         return descriptionTextView.getText().toString();
+    }
+
+    public void setDescription(String desc) {
+        descriptionTextView.setText(desc);
     }
 
     @Override

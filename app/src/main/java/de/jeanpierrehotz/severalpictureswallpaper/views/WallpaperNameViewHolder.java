@@ -18,6 +18,7 @@ package de.jeanpierrehotz.severalpictureswallpaper.views;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -31,7 +32,8 @@ public class WallpaperNameViewHolder extends RecyclerView.ViewHolder {
     private RelativeLayout rootView;
 
     private TextView captionTextView;
-    private TextView selectedTextView;
+    //    private TextView selectedTextView;
+    private ImageView selectedImageView;
 
     public WallpaperNameViewHolder(View itemView) {
         super(itemView);
@@ -39,7 +41,8 @@ public class WallpaperNameViewHolder extends RecyclerView.ViewHolder {
         rootView = (RelativeLayout) itemView.findViewById(R.id.rootlayout);
 
         captionTextView = (TextView) itemView.findViewById(R.id.setting_name_textview);
-        selectedTextView = (TextView) itemView.findViewById(R.id.setting_selected_textview);
+//        selectedTextView = (TextView) itemView.findViewById(R.id.setting_selected_textview);
+        selectedImageView = (ImageView) itemView.findViewById(R.id.setting_selected_imageview);
     }
 
     public void setCaption(String capt) {
@@ -48,9 +51,11 @@ public class WallpaperNameViewHolder extends RecyclerView.ViewHolder {
 
     public void setSelected(int sel, int num) {
         if (sel == num) {
-            selectedTextView.setText(rootView.getContext().getString(R.string.selected_text));
+//            selectedTextView.setText(rootView.getContext().getString(R.string.selected_text));
+            selectedImageView.setImageResource(R.drawable.ic_vector_selected_green);
         } else {
-            selectedTextView.setText("");
+//            selectedTextView.setText("");
+            selectedImageView.setImageDrawable(null);
         }
     }
 }

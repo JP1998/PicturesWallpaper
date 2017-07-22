@@ -257,6 +257,7 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
 
             if (settings.getImageList().size() > 0) {
                 currentImage = settings.getCurrentImage();
+                currentImage = getPreviousImageIndex();
 
                 fadeDirection = FadeDirection.forward;
 
@@ -304,12 +305,10 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
             }
             fadingEnsemble.lock();
 
-            wallpaperindex = newWallpaper;
-            saveWallpaperIndex();
+            WallpaperDataManager.saveSelectedSettingsIndex(SeveralPicturesWallpaperService.this, newWallpaper);
             loadPreferences();
 
             if (settings.getImageList().size() > 0) {
-                currentImage = getPreviousImageIndex();
                 settings.setCurrentImage(currentImage);
                 saveImageIndex();
                 refreshImages();
@@ -402,10 +401,6 @@ public class SeveralPicturesWallpaperService extends WallpaperService {
 
             handler.removeCallbacks(drawFading);
             handler.removeCallbacks(drawSolid);
-        }
-
-        public void saveWallpaperIndex() {
-            WallpaperDataManager.saveSelectedSettingsIndex(SeveralPicturesWallpaperService.this, wallpaperindex);
         }
 
         private void saveImageIndex() {

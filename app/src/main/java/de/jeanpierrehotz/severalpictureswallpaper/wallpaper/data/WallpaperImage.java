@@ -28,8 +28,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
-
-import com.blunderer.materialdesignlibrary.views.CardView;
+import android.widget.ImageView;
 
 import java.util.Locale;
 
@@ -72,7 +71,7 @@ public class WallpaperImage {
         }
     }
 
-    public void loadAsPreview(CardView toLoadTo) {
+    public PreviewLoaderTask loadAsPreview(ImageView v) {
         if (mImage == null) {
             BitmapFactory.Options opt = new BitmapFactory.Options();
             opt.inJustDecodeBounds = true;
@@ -81,9 +80,13 @@ public class WallpaperImage {
             x = opt.outWidth;
             y = opt.outHeight;
 
-            PreviewLoaderTask task = new PreviewLoaderTask(toLoadTo);
+            PreviewLoaderTask task = new PreviewLoaderTask(v);
             task.execute(x, y, SAMPLE_WIDTH, SAMPLE_HEIGHT);
+
+            return task;
         }
+
+        return null;
     }
 
     public void releaseImage() {
@@ -138,12 +141,16 @@ public class WallpaperImage {
         return inSampleSize;
     }
 
-    private class PreviewLoaderTask extends AsyncTask<Integer, Void, Bitmap> {
+    public class PreviewLoaderTask extends AsyncTask<Integer, Void, Bitmap> {
 
-        private CardView cardViewReference;
+        private ImageView imageViewReference;
 
-        public PreviewLoaderTask(CardView v) {
-            cardViewReference = v;
+        public PreviewLoaderTask(ImageView v) {
+            this.imageViewReference = v;
+        }
+
+        public void cancel() {
+            this.imageViewReference = null;
         }
 
         /**
@@ -165,10 +172,10 @@ public class WallpaperImage {
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-            if (bitmap != null && cardViewReference != null) {
+            if (bitmap != null && imageViewReference != null) {
                 mImage = bitmap;
-                cardViewReference.setImageDrawable(new BitmapDrawable(Resources.getSystem(), mImage));
-                cardViewReference = null;
+                imageViewReference.setImageDrawable(new BitmapDrawable(Resources.getSystem(), mImage));
+                imageViewReference = null;
             }
         }
     }

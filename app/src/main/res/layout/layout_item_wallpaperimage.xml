@@ -15,23 +15,92 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <com.blunderer.materialdesignlibrary.views.CardView
-        android:id="@+id/cardview_item_root"
+    <android.support.v7.widget.CardView
+        android:id="@+id/leyout_item_wallpaperimage_cardview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="@dimen/cardview_item_margin"
         android:layout_marginEnd="@dimen/cardview_item_margin"
-        android:layout_marginStart="@dimen/cardview_item_margin"
         android:layout_marginLeft="@dimen/cardview_item_margin"
+        android:layout_marginRight="@dimen/cardview_item_margin"
+        android:layout_marginStart="@dimen/cardview_item_margin"
         android:layout_marginTop="@dimen/cardview_item_margin"
-        android:elevation="16dp"
-        app:mdl_normalButton="Set as current image"
-        app:mdl_imagePosition="left"/>
+        app:cardBackgroundColor="#ffffff"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="16dp"
+        app:contentPadding="0dp">
+
+        <!--
+                app:cardBackgroundColor="#ffd700"
+        -->
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="180dp">
+
+            <ImageView
+                android:id="@+id/leyout_item_wallpaperimage_image_imageview"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:maxWidth="120dp" />
+
+            <TextView
+                android:id="@+id/leyout_item_wallpaperimage_imagefilename_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="6dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginTop="6dp"
+                android:layout_toEndOf="@+id/leyout_item_wallpaperimage_image_imageview"
+                android:layout_toRightOf="@+id/leyout_item_wallpaperimage_image_imageview"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="24sp" />
+
+            <TextView
+                android:id="@+id/leyout_item_wallpaperimage_imagefileresolution_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/leyout_item_wallpaperimage_imagefilename_textview"
+                android:layout_alignStart="@+id/leyout_item_wallpaperimage_imagefilename_textview"
+                android:layout_below="@+id/leyout_item_wallpaperimage_imagefilename_textview"
+                android:layout_marginTop="6dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/leyout_item_wallpaperimage_selectimage_button"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/leyout_item_wallpaperimage_image_imageview"
+                android:layout_marginBottom="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginStart="12dp"
+                android:layout_toEndOf="@+id/leyout_item_wallpaperimage_image_imageview"
+                android:layout_toRightOf="@+id/leyout_item_wallpaperimage_image_imageview"
+                android:text="@string/wallpaperitem_select" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_above="@+id/leyout_item_wallpaperimage_selectimage_button"
+                android:layout_marginBottom="12dp"
+                android:layout_toEndOf="@+id/leyout_item_wallpaperimage_image_imageview"
+                android:layout_toRightOf="@+id/leyout_item_wallpaperimage_image_imageview"
+                android:background="#aaaaaa">
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
 
 </LinearLayout>

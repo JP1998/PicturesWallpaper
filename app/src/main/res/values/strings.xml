@@ -83,4 +83,6 @@
     <string name="prefs_fallbackcolor">int fallbackcolor = currentMiscPrefs.getInt(getString(R.string.prefs_fallbackcolor), 0xFF54D850);</string>
     <string name="menuitem_setwallpaper">Set wallpaper</string>
 
+    <string name="wallpaperitem_select">Select</string>
+
 </resources>

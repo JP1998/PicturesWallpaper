@@ -17,61 +17,136 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:padding="16dp"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <LinearLayout
+    <!--LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:id="@+id/layout_colordialog_colorlayout"
+        tools:background="#36465d"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
+        android:layout_alignParentStart="true"/-->
 
-    <SeekBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <RelativeLayout
+        android:id="@+id/layout_colordialog_colorlayout"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:id="@+id/layout_colordialog_redseekbar"
-        android:thumbTint="#ff0000"
-        android:progressTint="#ff0000"
-        android:max="255"
+        tools:background="#36465d">
+
+        <!--
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+
+        android:id="@+id/layout_colordialog_indicatorswrapper"
+
         android:layout_below="@+id/layout_colordialog_colorlayout"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        -->
+
+        <TextView
+            android:id="@+id/layout_colordialog_indicator_rgb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:paddingBottom="6dp"
+            android:paddingEnd="12dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            tools:text="rgb(54, 70, 93)"
+            tools:textColor="#c9b9a2" />
+
+        <!--
+            android:gravity="start"
+            android:textAlignment="textStart"
+            tools:background="#c9b9a2"
+        -->
+
+        <TextView
+            android:id="@+id/layout_colordialog_indicator_hex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:paddingBottom="6dp"
+            android:paddingEnd="12dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            tools:text="#36465D"
+            tools:textColor="#c9b9a2" />
+
+        <!--
+            android:gravity="end"
+            android:textAlignment="textEnd"
+            tools:background="#c9b9a2"
+        -->
+
+    </RelativeLayout>
 
     <SeekBar
+        android:id="@+id/layout_colordialog_redseekbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/layout_colordialog_colorlayout"
         android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:max="255"
+        android:progressTint="#ff0000"
+        android:thumbTint="#ff0000"
+        tools:progress="0x36" />
+
+    <SeekBar
         android:id="@+id/layout_colordialog_greenseekbar"
-        android:thumbTint="#00ff00"
-        android:progressTint="#00ff00"
-        android:max="255"
-        android:layout_below="@+id/layout_colordialog_redseekbar"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
-
-    <SeekBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:id="@+id/layout_colordialog_blueseekbar"
-        android:thumbTint="#0000ff"
-        android:progressTint="#0000ff"
-        android:max="255"
-        android:layout_below="@+id/layout_colordialog_greenseekbar"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/layout_colordialog_redseekbar"
+        android:layout_marginBottom="10dp"
+        android:max="255"
+        android:progressTint="#00ff00"
+        android:thumbTint="#00ff00"
+        tools:progress="0x46" />
+
+    <SeekBar
+        android:id="@+id/layout_colordialog_blueseekbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/layout_colordialog_greenseekbar"
+        android:layout_marginBottom="10dp"
+        android:max="255"
+        android:progressTint="#0000ff"
+        android:thumbTint="#0000ff"
+        tools:progress="0x5d" />
 
 </RelativeLayout>

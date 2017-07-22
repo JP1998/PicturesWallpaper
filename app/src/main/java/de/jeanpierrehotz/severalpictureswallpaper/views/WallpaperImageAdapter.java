@@ -20,8 +20,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.blunderer.materialdesignlibrary.views.CardView;
+import android.widget.Button;
 
 import de.jeanpierrehotz.severalpictureswallpaper.R;
 import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperSettings;
@@ -34,7 +33,6 @@ public class WallpaperImageAdapter extends RecyclerView.Adapter<WallpaperImageVi
     private WallpaperSettings settings;
 
     private OnItemNormalButtonClickListener mNormalButtonClickListener;
-    private OnItemHighlightButtonClickListener mHighlightButtonclickListener;
 
     public WallpaperImageAdapter(WallpaperSettings settings) {
         this.settings = settings;
@@ -48,40 +46,42 @@ public class WallpaperImageAdapter extends RecyclerView.Adapter<WallpaperImageVi
         mNormalButtonClickListener = null;
     }
 
-    public void setOnItemHighlightButtonClickListener(OnItemHighlightButtonClickListener list) {
-        mHighlightButtonclickListener = list;
-    }
-
-    public void clearOnItemHighlightButtonClickListener() {
-        mHighlightButtonclickListener = null;
-    }
-
-
     @Override
     public WallpaperImageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_item_wallpaperimage, parent, false);
 
         final WallpaperImageViewHolder vh = new WallpaperImageViewHolder(v);
 
-        CardView cardView = (CardView) v.findViewById(R.id.cardview_item_root);
+        Button selectButton = vh.getSelectButton();
 
-        cardView.setOnNormalButtonClickListener(new View.OnClickListener() {
+        selectButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 if (mNormalButtonClickListener != null) {
                     mNormalButtonClickListener.onClick(vh, vh.getAdapterPosition());
                 }
             }
         });
 
-        cardView.setOnHighlightButtonClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mHighlightButtonclickListener != null) {
-                    mHighlightButtonclickListener.onClick(vh, vh.getAdapterPosition());
-                }
-            }
-        });
+//        CardView cardView = (CardView) v.findViewById(R.id.cardview_item_root);
+//
+//        cardView.setOnNormalButtonClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (mNormalButtonClickListener != null) {
+//                    mNormalButtonClickListener.onClick(vh, vh.getAdapterPosition());
+//                }
+//            }
+//        });
+//
+//        cardView.setOnHighlightButtonClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (mHighlightButtonclickListener != null) {
+//                    mHighlightButtonclickListener.onClick(vh, vh.getAdapterPosition());
+//                }
+//            }
+//        });
 
         return vh;
     }
@@ -90,6 +90,7 @@ public class WallpaperImageAdapter extends RecyclerView.Adapter<WallpaperImageVi
     public void onViewRecycled(WallpaperImageViewHolder holder) {
         super.onViewRecycled(holder);
 
+        holder.onUnbind();
         if (holder.getAdapterPosition() < settings.getImageList().size() && holder.getAdapterPosition() >= 0) {
             settings.getImageList().get(holder.getAdapterPosition()).releaseImage();
         }
@@ -106,10 +107,6 @@ public class WallpaperImageAdapter extends RecyclerView.Adapter<WallpaperImageVi
     }
 
     public interface OnItemNormalButtonClickListener {
-        void onClick(RecyclerView.ViewHolder vh, int pos);
-    }
-
-    public interface OnItemHighlightButtonClickListener {
         void onClick(RecyclerView.ViewHolder vh, int pos);
     }
 }

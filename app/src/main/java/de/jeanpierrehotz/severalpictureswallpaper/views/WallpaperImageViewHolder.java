@@ -16,13 +16,13 @@
 
 package de.jeanpierrehotz.severalpictureswallpaper.views;
 
-import android.support.v7.widget.AppCompatTextView;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-
-import com.blunderer.materialdesignlibrary.views.CardView;
+import android.widget.TextView;
 
 import de.jeanpierrehotz.severalpictureswallpaper.R;
 import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImage;
@@ -32,24 +32,43 @@ import de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data.WallpaperImage;
  */
 public class WallpaperImageViewHolder extends RecyclerView.ViewHolder {
 
-    private CardView mRootCardView;
+    private LinearLayout rootLayout;
+
+    private CardView itemCardView;
+
+    private ImageView imageView;
+    private TextView captionView;
+    private TextView resolutionView;
+
+    private Button selectButton;
+
+    private WallpaperImage.PreviewLoaderTask loader;
 
     public WallpaperImageViewHolder(View itemView) {
         super(itemView);
 
-        mRootCardView = (CardView) itemView.findViewById(R.id.cardview_item_root);
-
-        // Retrieve the caption and set its ellipsize and singleline attributes, since there are some
-        // bugs with this by defining it in the styles.xml :(
-        AppCompatTextView tv0 = (AppCompatTextView) ((LinearLayout) ((LinearLayout) mRootCardView.getChildAt(0)).getChildAt(1)).getChildAt(0);
-        tv0.setEllipsize(TextUtils.TruncateAt.END);
-        tv0.setSingleLine(true);
+        this.rootLayout = (LinearLayout) itemView;
+        this.itemCardView = (CardView) itemView.findViewById(R.id.leyout_item_wallpaperimage_cardview);
+        this.imageView = (ImageView) itemView.findViewById(R.id.leyout_item_wallpaperimage_image_imageview);
+        this.captionView = (TextView) itemView.findViewById(R.id.leyout_item_wallpaperimage_imagefilename_textview);
+        this.resolutionView = (TextView) itemView.findViewById(R.id.leyout_item_wallpaperimage_imagefileresolution_textview);
+        this.selectButton = (Button) itemView.findViewById(R.id.leyout_item_wallpaperimage_selectimage_button);
     }
 
     public void onBind(WallpaperImage img) {
-        img.loadAsPreview(mRootCardView);
-        mRootCardView.setTitle(img.getFileName());
-        mRootCardView.setDescription(img.getResolution());
+        this.loader = img.loadAsPreview(this.imageView);
+        this.captionView.setText(img.getFileName());
+        this.resolutionView.setText(img.getResolution());
     }
 
+    public void onUnbind() {
+        if (this.loader != null) {
+            this.loader.cancel();
+        }
+        this.imageView.setImageDrawable(null);
+    }
+
+    public Button getSelectButton() {
+        return selectButton;
+    }
 }

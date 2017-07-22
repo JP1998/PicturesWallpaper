@@ -23,10 +23,12 @@ import android.graphics.Color;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 
 import de.jeanpierrehotz.severalpictureswallpaper.R;
+import de.jeanpierrehotz.severalpictureswallpaper.utils.CommonUtils;
 
 /**
  *
@@ -35,7 +37,10 @@ public class ColorDialog implements SeekBar.OnSeekBarChangeListener, DialogInter
 
     private AlertDialog dialog;
 
-    private LinearLayout colorLayout;
+    private TextView rgbIndicatorView;
+    private TextView hexIndicatorView;
+
+    private RelativeLayout /*LinearLayout*/ colorLayout;
 
     private SeekBar rSeekBar;
     private SeekBar gSeekBar;
@@ -94,7 +99,10 @@ public class ColorDialog implements SeekBar.OnSeekBarChangeListener, DialogInter
         dialog.show();
         dialog.cancel();
 
-        colorLayout = (LinearLayout) dialog.findViewById(R.id.layout_colordialog_colorlayout);
+        colorLayout = (RelativeLayout /*LinearLayout*/) dialog.findViewById(R.id.layout_colordialog_colorlayout);
+
+        rgbIndicatorView = (TextView) dialog.findViewById(R.id.layout_colordialog_indicator_rgb);
+        hexIndicatorView = (TextView) dialog.findViewById(R.id.layout_colordialog_indicator_hex);
 
         rSeekBar = (SeekBar) dialog.findViewById(R.id.layout_colordialog_redseekbar);
         rSeekBar.setOnSeekBarChangeListener(this);
@@ -149,7 +157,14 @@ public class ColorDialog implements SeekBar.OnSeekBarChangeListener, DialogInter
     }
 
     private void updateColor() {
+        int inv = CommonUtils.ColorUtils.invert(mColor);
+
         colorLayout.setBackgroundColor(mColor);
+        // update the color indicators
+        rgbIndicatorView.setTextColor(inv);
+        rgbIndicatorView.setText(CommonUtils.ColorUtils.formatToRGB(mColor));
+        hexIndicatorView.setTextColor(inv);
+        hexIndicatorView.setText(CommonUtils.ColorUtils.formatToHEX(mColor));
     }
 
     public OnColorChangedListener getOnColorChangedListener() {
@@ -195,4 +210,38 @@ public class ColorDialog implements SeekBar.OnSeekBarChangeListener, DialogInter
     public interface OnColorChangedListener {
         void onColorChanged(int color, boolean finalvalue);
     }
+
+//    public static String formatToRGB(@ColorInt int col) {
+//        return "rgb({r}, {g}, {b})"
+//                .replace("{r}", "" + Color.red(col))
+//                .replace("{g}", "" + Color.green(col))
+//                .replace("{b}", "" + Color.blue(col));
+//    }
+//
+//    public static String formatToHEX(@ColorInt int col) {
+//        return "#" + stretch(Integer.toHexString(col & 0xFFFFFF).toUpperCase(), '0', 6);
+//    }
+//
+//    public static String stretch(String str, char stretchWith, int minLength) {
+//        String result = str;
+//
+//        while(result.length() < minLength) {
+//            result = stretchWith + result;
+//        }
+//
+//        return result;
+//    }
+//
+//    public static int invert(int col) {
+//        return Color.argb(
+//                Color.alpha(col),
+//                0xFF - Color.red(col),
+//                0xFF - Color.green(col),
+//                0xFF - Color.blue(col)
+//        );
+//    }
+//
+//    public static int avg(int col) {
+//        return (Color.red(col) + Color.green(col) + Color.blue(col)) / 3;
+//    }
 }
