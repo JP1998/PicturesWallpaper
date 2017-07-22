@@ -32,12 +32,7 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class WallpaperPictureSelector {
 
@@ -85,10 +80,10 @@ public class WallpaperPictureSelector {
                     outFile = new File(outFilePath);
                 }
             } else {
-                outFile = CommonUtils.generateExternalImageCacheFile(mContext, ".jpg");
+                outFile = CommonUtils.FileUtils.generateExternalImageCacheFile(mContext, ".jpg");
                 Bitmap bitmap = data.getParcelableExtra("data");
                 if (bitmap != null) {
-                    ImageUtils.saveBitmap(bitmap, outFile.getPath(), Bitmap.CompressFormat.JPEG, 80);
+                    CommonUtils.ImageUtils.saveBitmap(bitmap, outFile.getPath(), Bitmap.CompressFormat.JPEG, 80);
                 }
             }
             if (outFile != null && outFile.exists()) {
@@ -140,8 +135,8 @@ public class WallpaperPictureSelector {
     private void handleSelectedResult(String fileName) {
         File f = new File(fileName);
         if (f.exists()) {
-            File outputFile = CommonUtils.generateExternalImageCacheFile(mContext, ".jpg");
-            CommonUtils.copy(new File(fileName), outputFile);
+            File outputFile = CommonUtils.FileUtils.generateExternalImageCacheFile(mContext, ".jpg");
+            CommonUtils.FileUtils.copy(new File(fileName), outputFile);
             if (mCallback != null) {
                 mCallback.onSelectedResult(outputFile.getAbsolutePath());
             }
@@ -184,7 +179,8 @@ public class WallpaperPictureSelector {
             return;
         }
 
-        File outFile = CommonUtils.generateExternalImageCacheFile(mContext, ".jpg");
+//        File outFile = CommonUtils.FileUtils.generateExternalImageCacheFile(mContext, ".jpg");
+        File outFile = CommonUtils.FileUtils.generateExternalImageCacheFile(mContext, srcFile, ".jpg");
         if (outFile.exists()) {
             outFile.delete();
         }
@@ -199,8 +195,8 @@ public class WallpaperPictureSelector {
         if (uri.toString().contains("%")) {
             String inputFileName = srcFile.getName();
             String ext = inputFileName.substring(inputFileName.lastIndexOf("."));
-            mTempFile = CommonUtils.generateExternalImageCacheFile(mContext, ext);
-            CommonUtils.copy(srcFile, mTempFile);
+            mTempFile = CommonUtils.FileUtils.generateExternalImageCacheFile(mContext, ext);
+            CommonUtils.FileUtils.copy(srcFile, mTempFile);
             uri = Uri.fromFile(mTempFile);
         }
         Intent intent = new Intent("com.android.camera.action.CROP");
@@ -368,89 +364,90 @@ public class WallpaperPictureSelector {
         }
     }
 
-    private static class CommonUtils {
-        private static boolean copy(File source, File dest) {
-            BufferedInputStream bis = null;
-            BufferedOutputStream bos = null;
-            boolean result = true;
-            try {
-                bis = new BufferedInputStream(new FileInputStream(source));
-                bos = new BufferedOutputStream(new FileOutputStream(dest, false));
+//    private static class CommonUtils {
+//        private static boolean copy(File source, File dest) {
+//            BufferedInputStream bis = null;
+//            BufferedOutputStream bos = null;
+//            boolean result = true;
+//            try {
+//                bis = new BufferedInputStream(new FileInputStream(source));
+//                bos = new BufferedOutputStream(new FileOutputStream(dest, false));
+//
+//                byte[] buf = new byte[1024];
+//                bis.read(buf);
+//
+//                do {
+//                    bos.write(buf);
+//                } while (bis.read(buf) != -1);
+//            } catch (IOException e) {
+//                result = false;
+//            } finally {
+//                try {
+//                    if (bis != null) bis.close();
+//                    if (bos != null) bos.close();
+//                } catch (IOException e) {
+//                    result = false;
+//                }
+//            }
+//
+//            return result;
+//        }
+//
+//        private static File generateExternalImageCacheFile(Context context, String ext) {
+//            String fileName = "img_" + System.currentTimeMillis();
+//            return generateExternalImageCacheFile(context, fileName, ext);
+//        }
+//
+//        private static File generateExternalImageCacheFile(Context context, String fileName, String ext) {
+//            File cacheDir = getExternalImageCacheDir(context);
+//            String path = cacheDir.getPath() + File.separator + fileName + ext;
+//            return new File(path);
+//        }
+//
+//        private static File getExternalImageCacheDir(Context context) {
+//            File externalCacheDir = getExternalCacheDir(context);
+//            if (externalCacheDir != null) {
+//                String path = externalCacheDir.getPath() + "/image/image_selector";
+//                File file = new File(path);
+//                if (file.exists() && file.isFile()) {
+//                    file.delete();
+//                }
+//                if (!file.exists()) {
+//                    file.mkdirs();
+//                }
+//                return file;
+//            }
+//            final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache" + "/image";
+//            return new File(cacheDir);
+//        }
+//
+//        private static File getExternalCacheDir(Context context) {
+//            File file = context.getExternalCacheDir();
+//            if (file == null) {
+//                final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache";
+//                file = new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
+//            }
+//            return file;
+//        }
+//    }
+//
+//    private static class ImageUtils {
+//        private static void saveBitmap(Bitmap bmp, String filePath, Bitmap.CompressFormat format, int quality) {
+//            FileOutputStream fo;
+//            try {
+//                File f = new File(filePath);
+//                if (f.exists()) {
+//                    f.delete();
+//                }
+//                f.createNewFile();
+//                fo = new FileOutputStream(f, true);
+//                bmp.compress(format, quality, fo);
+//                fo.flush();
+//                fo.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
-                byte[] buf = new byte[1024];
-                bis.read(buf);
-
-                do {
-                    bos.write(buf);
-                } while (bis.read(buf) != -1);
-            } catch (IOException e) {
-                result = false;
-            } finally {
-                try {
-                    if (bis != null) bis.close();
-                    if (bos != null) bos.close();
-                } catch (IOException e) {
-                    result = false;
-                }
-            }
-
-            return result;
-        }
-
-        private static File generateExternalImageCacheFile(Context context, String ext) {
-            String fileName = "img_" + System.currentTimeMillis();
-            return generateExternalImageCacheFile(context, fileName, ext);
-        }
-
-        private static File generateExternalImageCacheFile(Context context, String fileName, String ext) {
-            File cacheDir = getExternalImageCacheDir(context);
-            String path = cacheDir.getPath() + File.separator + fileName + ext;
-            return new File(path);
-        }
-
-        private static File getExternalImageCacheDir(Context context) {
-            File externalCacheDir = getExternalCacheDir(context);
-            if (externalCacheDir != null) {
-                String path = externalCacheDir.getPath() + "/image/image_selector";
-                File file = new File(path);
-                if (file.exists() && file.isFile()) {
-                    file.delete();
-                }
-                if (!file.exists()) {
-                    file.mkdirs();
-                }
-                return file;
-            }
-            final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache" + "/image";
-            return new File(cacheDir);
-        }
-
-        private static File getExternalCacheDir(Context context) {
-            File file = context.getExternalCacheDir();
-            if (file == null) {
-                final String cacheDir = "/Android/data/" + context.getPackageName() + "/cache";
-                file = new File(Environment.getExternalStorageDirectory().getPath() + cacheDir);
-            }
-            return file;
-        }
-    }
-
-    private static class ImageUtils {
-        private static void saveBitmap(Bitmap bmp, String filePath, Bitmap.CompressFormat format, int quality) {
-            FileOutputStream fo;
-            try {
-                File f = new File(filePath);
-                if (f.exists()) {
-                    f.delete();
-                }
-                f.createNewFile();
-                fo = new FileOutputStream(f, true);
-                bmp.compress(format, quality, fo);
-                fo.flush();
-                fo.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

@@ -16,6 +16,8 @@
 
 package de.jeanpierrehotz.severalpictureswallpaper.wallpaper.data;
 
+import android.support.annotation.ColorInt;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +30,7 @@ public class WallpaperSettings {
     public static final boolean DEFAULT_DETECTGESTURES = true;
     public static final boolean DEFAULT_LOCKWALLPAPER = true;
     public static final int DEFAULT_SHOWPICTURETIME = 60;
+    @ColorInt
     public static final int DEFAULT_FALLBACKCOLOR = 0xFF36465D;
     public static final int DEFAULT_CURRENTIMAGE = 0;
 
@@ -36,6 +39,7 @@ public class WallpaperSettings {
     private boolean detectGestures;
     private boolean lockWallpaper;
     private int showPictureTime;
+    @ColorInt
     private int fallbackcolor;
     private int currentImage;
     private List<WallpaperImage> images;
@@ -52,7 +56,7 @@ public class WallpaperSettings {
         );
     }
 
-    WallpaperSettings(String capt, boolean dG, boolean lW, int sPT, int fBC, int cI, List<WallpaperImage> imgs) {
+    WallpaperSettings(String capt, boolean dG, boolean lW, int sPT, @ColorInt int fBC, int cI, List<WallpaperImage> imgs) {
         this.caption = capt;
         this.detectGestures = dG;
         this.lockWallpaper = lW;
@@ -94,11 +98,12 @@ public class WallpaperSettings {
         this.showPictureTime = showPictureTime;
     }
 
+    @ColorInt
     public int getFallbackcolor() {
         return fallbackcolor;
     }
 
-    public void setFallbackcolor(int fallbackcolor) {
+    public void setFallbackcolor(@ColorInt int fallbackcolor) {
         this.fallbackcolor = fallbackcolor;
     }
 

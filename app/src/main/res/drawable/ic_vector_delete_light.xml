@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~     Copyright 2017 Jean-Pierre Hotz
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,18 +14,14 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <color name="colorPrimary">#36465d</color>
-    <color name="colorPrimaryDark">#26364d</color>
-    <color name="colorAccent">#6441a4</color>
-    <color name="tumblr">#36465d</color>
-    <color name="dividercolor">#A0A0A0</color>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportHeight="24"
+    android:viewportWidth="24">
 
-    <color name="intro">#3F51B5</color>
-    <color name="intro_dark">#303F9F</color>
+    <path
+        android:fillColor="@color/iconcolor_light"
+        android:pathData="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
 
-    <color name="iconcolor_light">#ffffff</color>
-    <color name="iconcolor_red">#ff6446</color>
-    <color name="iconcolor_green">#afff46</color>
-
-</resources>
+</vector>
