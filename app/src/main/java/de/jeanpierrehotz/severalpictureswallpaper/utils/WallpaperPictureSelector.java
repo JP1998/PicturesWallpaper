@@ -30,7 +30,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.File;
 
@@ -178,8 +180,10 @@ public class WallpaperPictureSelector {
             }
             return;
         }
+        if (mContext == null) {
+            throw new NullPointerException("'mContext' is null.");
+        }
 
-//        File outFile = CommonUtils.FileUtils.generateExternalImageCacheFile(mContext, ".jpg");
         File outFile = CommonUtils.FileUtils.generateExternalImageCacheFile(mContext, srcFile, ".jpg");
         if (outFile.exists()) {
             outFile.delete();
@@ -190,14 +194,16 @@ public class WallpaperPictureSelector {
 
         mSrcFile = srcFile;
         mOutFile = outFile;
-        Uri uri = Uri.fromFile(srcFile);
+
+        Uri uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".imagefileprovider.provider", srcFile);
 
         if (uri.toString().contains("%")) {
             String inputFileName = srcFile.getName();
             String ext = inputFileName.substring(inputFileName.lastIndexOf("."));
             mTempFile = CommonUtils.FileUtils.generateExternalImageCacheFile(mContext, ext);
             CommonUtils.FileUtils.copy(srcFile, mTempFile);
-            uri = Uri.fromFile(mTempFile);
+
+            uri = FileProvider.getUriForFile(mContext, mContext.getApplicationContext().getPackageName() + ".imagefileprovider.provider", mTempFile);
         }
         Intent intent = new Intent("com.android.camera.action.CROP");
         intent.setDataAndType(uri, "image/*");
@@ -205,11 +211,13 @@ public class WallpaperPictureSelector {
 
         intent.putExtra("aspectX", mAspectX);
         intent.putExtra("aspectY", mAspectY);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(outFile));
 
-        if (mContext == null) {
-            throw new NullPointerException("'mHolder' is null.");
-        }
+        Uri photoURI = Uri.fromFile(outFile);
+
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+
         if (mContext instanceof Activity) {
             ((Activity) mContext).startActivityForResult(intent, CROP_PHOTO_SMALL);
         }
