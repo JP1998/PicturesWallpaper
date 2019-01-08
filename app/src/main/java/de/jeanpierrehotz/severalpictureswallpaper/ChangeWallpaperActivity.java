@@ -62,6 +62,7 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
     // Views & Objects
     private LinearLayout bottomSheet;
     private BottomSheetBehavior<LinearLayout> bottomSheetBehaviour;
+    private TextView bottomSheetCaption;
     private TextView furtherSettings_Value_TextView;
     private SeekBar furtherSettings_Value_SeekBar;
     private Switch furtherSettings_DetectGestures_Switch;
@@ -69,6 +70,16 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
     private ColorView furtherSettings_Fallbackcolor_ColorView;
     private WallpaperSettings settings;
     // Listener
+    private View.OnClickListener bottomSheetCaption_onClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(bottomSheetBehaviour.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                bottomSheetBehaviour.setState(BottomSheetBehavior.STATE_EXPANDED);
+            } else {
+                bottomSheetBehaviour.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        }
+    };
     private SeekBar.OnSeekBarChangeListener furtherSettings_Value_SeekBar_OnChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int i, boolean userInput) {
@@ -181,6 +192,9 @@ public class ChangeWallpaperActivity extends AppCompatActivity {
 
         bottomSheet = (LinearLayout) findViewById(R.id.layout_content_main_bottomsheet_rootlinearlayout);
         bottomSheetBehaviour = BottomSheetBehavior.from(bottomSheet);
+
+        bottomSheetCaption = (TextView) findViewById(R.id.bottomSheetCaption);
+        bottomSheetCaption.setOnClickListener(bottomSheetCaption_onClickListener);
 
         furtherSettings_Value_TextView = (TextView) findViewById(R.id.furthersettings_time_value);
         furtherSettings_Value_SeekBar = (SeekBar) findViewById(R.id.furthersettings_time_seekbar);
